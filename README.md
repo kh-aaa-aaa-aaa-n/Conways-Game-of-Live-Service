@@ -1,1 +1,1 @@
-# Conway-s-Game-of-Live-Service
+# Conways-Game-of-Live-Service
