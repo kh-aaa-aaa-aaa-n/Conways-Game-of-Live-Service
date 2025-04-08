@@ -1,0 +1,21 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conway's Game of Live Service</title>
+    
+    <link rel="stylesheet" href="{% static 'game/styles.css' %}">
+</head>
+<body>
+    <h1>Conway's Game of Live Service</h1>
+    
+    <div id="grid"></div>
+    
+    <button onclick="startGame()">Start Game</button>
+    
+    <script src="{% static 'game/game.js' %}"></script>
+</body>
+</html>
