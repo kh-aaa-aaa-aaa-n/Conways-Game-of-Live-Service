@@ -6,16 +6,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conway's Game of Live Service</title>
-    
     <link rel="stylesheet" href="{% static 'game/styles.css' %}">
 </head>
 <body>
     <h1>Conway's Game of Live Service</h1>
-    
+
     <div id="grid"></div>
-    
-    <button onclick="startGame()">Start Game</button>
-    
+
+    <form action="{% url 'login' %}" method="get">
+        <button type="submit">Start Game</button>
+    </form>
+
     <script src="{% static 'game/game.js' %}"></script>
 </body>
 </html>
+
