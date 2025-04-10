@@ -3,42 +3,126 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Conway's Game of Life</title>
-    <link rel="stylesheet" href="{% static 'game/styles.css' %}">
+    <title>Conway's Game of Life - Play</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
     <style>
+        /* Basic page layout styles */
         body {
             font-family: 'Segoe UI', sans-serif;
-            background-color: #f2f2f2;
-            text-align: center;
-            padding: 50px;
-        }
-        h1 {
-            font-size: 2.5em;
+            background-color: #e9ecef; /* Light grey background */
             color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
         }
-        button {
-            padding: 10px 25px;
-            font-size: 1em;
-            background-color: #008CBA;
+        header {
+            background-color: #343a40; /* Dark header */
             color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 20px;
+            width: 100%;
+            padding: 15px 0;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        button:hover {
-            background-color: #0072a1;
+        header h1 {
+            margin: 0;
+            font-size: 2em;
         }
-        #grid {
-            margin: 40px auto;
-            max-width: 600px;
+        .user-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 0.9em;
+        }
+        .user-info a {
+            color: #adb5bd; /* Lighter link color */
+            text-decoration: none;
+            margin-left: 10px;
+        }
+        .user-info a:hover {
+            color: white;
+        }
+        main {
+            flex: 1;
+            width: 100%;
+            max-width: 1200px; /* Limit content width */
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .game-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .game-description p {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            color: #555;
+        }
+        /* Placeholder for controls */
+        .controls {
+            margin: 20px 0;
+        }
+        .controls button {
+             padding: 8px 15px;
+             font-size: 0.9em;
+             margin: 0 5px;
+             background-color: #6c757d; /* Grey buttons */
+             color: white;
+             border: none;
+             border-radius: 5px;
+             cursor: pointer;
+        }
+         .controls button:hover {
+             background-color: #5a6268;
+         }
+
+        footer {
+            text-align: center;
+            padding: 15px;
+            font-size: 0.8em;
+            color: #6c757d;
+            width: 100%;
+            margin-top: auto; /* Push footer down */
         }
     </style>
 </head>
 <body>
-    <h1>Conway's Game of Life</h1>
-    <div id="grid"></div>
-    <button onclick="window.location.href='/login/'">Start Game</button>
-    <script src="{% static 'game/game.js' %}"></script>
+    <header>
+        <h1>Conway's Game of Life</h1>
+        <div class="user-info">
+            Welcome, {{ user.username }}!
+            <a href="{% url 'game:logout' %}">Logout</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="game-container">
+            <div class="game-description">
+                <p>Start the simulation!</p>
+                </div>
+
+            <div id="grid">
+                </div>
+
+            <div class="controls">
+                <button id="start-button">Start</button>
+                <button id="stop-button">Stop</button>
+                <button id="clear-button">Clear</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        &copy; CSCI4830
+    </footer>
+
+    <script src="{% static 'game.js' %}"></script>
 </body>
 </html>

@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome - Conway's Game of Life</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f2f2f2;
+            text-align: center;
+            padding: 50px;
+        }
+        h1 {
+            font-size: 2.5em;
+            color: #333;
+        }
+        p {
+            font-size: 1.2em;
+            color: #555;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 1.1em;
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 30px;
+            text-decoration: none; /* Ensure button looks right if inside <a> tag */
+        }
+        button:hover {
+            background-color: #0072a1;
+        }
+        a {
+            text-decoration: none; /* Remove underline from links */
+        }
+        .logout-link {
+            margin-top: 20px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Conway's Game of Life</h1>
+    <p>Welcome, {{ user.username }}!</p>
+
+    <a href="{% url 'game:game' %}"><button>Start Game</button></a>
+
+    <p class="logout-link"><a href="{% url 'game:logout' %}">Logout</a></p>
+</body>
+</html>
