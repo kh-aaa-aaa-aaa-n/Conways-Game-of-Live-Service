@@ -4,18 +4,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const cols = 50;
 
     let socket = null;
-    let timeoutActive = false; // To handle potential move timeouts from backend
-
-    if (!gridContainer) {
-        console.error("Grid container ('#grid') not found!");
-        return;
-    }
+    let timeoutActive = false;
 
     // --- WebSocket Connection ---
     function connectWebSocket() {
-        // Use ws:// locally, wss:// if served over https
         const wsProtocol = window.location.protocol === "https:" ? "wss://" : "ws://";
-        // Ensure the path matches game/routing.py
         const wsURL = wsProtocol + window.location.host + "/ws/game/";
         console.log("Connecting to WebSocket:", wsURL);
 
@@ -23,48 +16,34 @@ document.addEventListener('DOMContentLoaded', function() {
 
         socket.onopen = function(e) {
             console.log("WebSocket connection established");
-            // Optional: Request initial state from server?
             // socket.send(JSON.stringify({ action: "get_initial_state" }));
         };
 
         socket.onmessage = function(e) {
             const data = JSON.parse(e.data);
-            console.log("WebSocket message received:", data);
+            // console.log("WebSocket message received:", data); // Less verbose logging
 
             if (data.action === "update_grid") {
                 updateGridFromServer(data.grid);
-            }
-
-            if (data.type === "error") {
-                alert("Error: " + data.message); // Show backend errors
-                if (data.message.includes("log in")) {
-                    // Redirect if backend indicates login is required
-                    window.location.href = "{% url 'game:login' %}"; 
-                                                                    
-                } else if (data.message.includes("wait")) {
-                    console.warn("Timeout active, interactions disabled.");
+            } else if (data.type === "error") {
+                console.error("Backend Error:", data.message);
+                // Consider using a custom, styled modal for errors instead of alert
+                alert("Error: " + data.message);
+                if (data.message.includes("wait")) {
                     timeoutActive = true;
-                    // Optional: Visually indicate timeout (e.g., disable buttons)
                 }
-            }
-
-            if (data.type === "timeout_end") {
+            } else if (data.type === "timeout_end") {
                 console.log("Timeout ended, interactions enabled.");
                 timeoutActive = false;
-                 // Optional: Re-enable buttons etc.
             }
-            // Add handlers for other potential message types from backend
+            // Handle other message types if needed
         };
 
         socket.onclose = function(event) {
             console.warn("WebSocket connection closed:", event);
-            // Avoid immediate redirect to prevent loops if connection fails instantly
-            // Maybe show a message or attempt reconnect with delay
-            alert("WebSocket connection lost. Please refresh or log in again.");
-            // Consider redirecting only if close code indicates authentication issue
-            // if (event.code === YOUR_AUTH_ERROR_CODE) {
-            //    window.location.href = "{% url 'game:login' %}";
-            // }
+            if (!event.wasClean) {
+                 alert("WebSocket connection lost. Please refresh the page.");
+            }
         };
 
         socket.onerror = function(error) {
@@ -75,101 +54,145 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Update Grid Based on Server Data ---
     function updateGridFromServer(serverCells) {
-        // Assume serverCells is an array ]
-        // Or potentially a simpler format depending on your consumer
+        if (!Array.isArray(serverCells)) {
+            console.error("Invalid grid data received:", serverCells);
+            return;
+        }
         const cellMap = new Map(serverCells.map(cell => [`${cell.x},${cell.y}`, cell.is_alive]));
-
         document.querySelectorAll(".cell").forEach(cell => {
-            const x = cell.dataset.x;
-            const y = cell.dataset.y;
-            const isAlive = cellMap.get(`${x},${y}`); // Check if this cell is in the map and alive
-
-            if (isAlive) { // Check for true, not just existence
-                cell.classList.add("alive");
-            } else {
-                cell.classList.remove("alive");
-            }
+            const isAlive = cellMap.get(`${cell.dataset.x},${cell.dataset.y}`);
+            cell.classList.toggle("alive", isAlive === true);
         });
-        // console.log("Grid updated from server data.");
+        // console.log("Grid updated from server data."); // Less verbose logging
     }
 
     // --- Handle Clicking a Cell ---
     function handleCellClick(event) {
         if (timeoutActive) {
             console.log("Timeout active, move ignored.");
-            return; // Ignore clicks if timeout is active
+            return;
         }
-
         const cell = event.target;
-        if (cell.classList.contains('cell') && cell.dataset.x && cell.dataset.y) {
+        if (cell.classList.contains('cell') && cell.dataset.x != null && cell.dataset.y != null) {
             const x = parseInt(cell.dataset.x, 10);
             const y = parseInt(cell.dataset.y, 10);
-
-            // Send toggle request via WebSocket if connected
             if (socket && socket.readyState === WebSocket.OPEN) {
-                console.log(`Sending toggle for cell (${x}, ${y})`);
-                socket.send(JSON.stringify({
-                    action: "toggle", // Ensure consumer expects this action
-                    x: x,
-                    y: y
-                }));
-                 // Optional: Optimistic UI update (toggle locally immediately)
-                 // cell.classList.toggle('alive');
-                 // Note: Server response should confirm the actual state via updateGridFromServer
+                socket.send(JSON.stringify({ action: "toggle_cell", x: x, y: y }));
             } else {
                 console.warn("WebSocket not connected. Cannot toggle cell.");
-                alert("Not connected to game server. Please refresh.");
+                alert("Not connected to game server.");
             }
         }
     }
 
-
     // --- Create the Visual Grid Structure ---
     function createVisualGrid() {
-        gridContainer.innerHTML = ''; // Clear previous grid
+        if (!gridContainer) { console.error("Grid container not found!"); return; }
+        gridContainer.innerHTML = '';
         gridContainer.style.setProperty('--grid-rows', rows);
         gridContainer.style.setProperty('--grid-cols', cols);
+        gridContainer.style.gridTemplateColumns = `repeat(${cols}, auto)`;
+        gridContainer.style.gridTemplateRows = `repeat(${rows}, auto)`;
 
         for (let r = 0; r < rows; r++) {
             for (let c = 0; c < cols; c++) {
                 const cell = document.createElement('div');
                 cell.classList.add('cell');
-                // Add data attributes for coordinates, essential for click handler
-                cell.dataset.x = c; // x corresponds to column
-                cell.dataset.y = r; // y corresponds to row
+                cell.dataset.x = c;
+                cell.dataset.y = r;
                 gridContainer.appendChild(cell);
             }
         }
+        // Ensure listener is added only once
+        if (!gridContainer.hasAttribute('listener-added')) {
+             gridContainer.addEventListener('click', handleCellClick);
+             gridContainer.setAttribute('listener-added', 'true');
+        }
         console.log(`Created visual grid (${rows}x${cols}).`);
-        // Add the single event listener to the container (event delegation)
-        gridContainer.addEventListener('click', handleCellClick);
-        console.log("Click listener added to grid container.");
     }
 
     // --- Add Listeners for Control Buttons ---
-    document.getElementById('start-button')?.addEventListener('click', () => {
-        console.log("Start button clicked (functionality not implemented)");
-        // TODO: Send 'start' command if needed by backend logic
-        // if (socket && socket.readyState === WebSocket.OPEN) { socket.send(JSON.stringify({ action: "start_simulation" })); }
-    });
+    function setupControlButtons() {
+        const buttons = {
+            'start-button': 'start_simulation',
+            'stop-button': 'stop_simulation',
+            'clear-button': 'clear_grid'
+        };
 
-     document.getElementById('stop-button')?.addEventListener('click', () => {
-        console.log("Stop button clicked (functionality not implemented)");
-         // TODO: Send 'stop' command via WebSocket if needed
-         // if (socket && socket.readyState === WebSocket.OPEN) { socket.send(JSON.stringify({ action: "stop_simulation" })); }
-    });
+        function sendControlAction(action) {
+             if (socket && socket.readyState === WebSocket.OPEN) {
+                console.log(`Sending action: ${action}`);
+                socket.send(JSON.stringify({ action: action }));
+            } else {
+                console.warn("WebSocket not connected. Cannot send action:", action);
+                alert("Not connected to game server.");
+            }
+        }
 
-     document.getElementById('clear-button')?.addEventListener('click', () => {
-        console.log("Clear button clicked (functionality not implemented)");
-         // TODO: Send 'clear' command via WebSocket
-         // if (socket && socket.readyState === WebSocket.OPEN) { socket.send(JSON.stringify({ action: "clear_grid" })); }
-         // TODO: Optionally clear grid visually immediately
-         // document.querySelectorAll(".cell").forEach(cell => cell.classList.remove("alive"));
+        for (const [buttonId, action] of Object.entries(buttons)) {
+            const btn = document.getElementById(buttonId);
+            if (btn) {
+                btn.addEventListener('click', () => sendControlAction(action));
+            }
+        }
+    }
+
+    // --- Modal Control Logic ---
+    const purposeModal = document.getElementById('purpose-modal');
+    const rulesModal = document.getElementById('rules-modal');
+    const modalBackdrop = document.getElementById('modal-backdrop');
+    const purposeBtn = document.getElementById('purpose-btn');
+    const rulesBtn = document.getElementById('rules-btn');
+    const closeBtns = document.querySelectorAll('.modal-close-btn');
+
+    function openModal(modal) {
+        if (modal) {
+            modal.classList.add('modal-open');
+            modalBackdrop.classList.add('modal-open');
+            document.body.classList.add('modal-active'); // <<< ADD THIS CLASS TO BODY
+        }
+    }
+
+    function closeModal(modal) {
+        if (modal) {
+            modal.classList.remove('modal-open');
+            const anyModalOpen = document.querySelector('.modal.modal-open');
+            if (!anyModalOpen) {
+                 modalBackdrop.classList.remove('modal-open');
+                 document.body.classList.remove('modal-active'); // <<< REMOVE THIS CLASS FROM BODY
+            }
+        }
+    }
+
+    if (purposeBtn && purposeModal) {
+        purposeBtn.addEventListener('click', (e) => { e.stopPropagation(); openModal(purposeModal); });
+    }
+    if (rulesBtn && rulesModal) {
+        rulesBtn.addEventListener('click', (e) => { e.stopPropagation(); openModal(rulesModal); });
+    }
+    closeBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const modalId = btn.getAttribute('data-modal-id');
+            closeModal(document.getElementById(modalId));
+        });
     });
+    if (modalBackdrop) {
+        modalBackdrop.addEventListener('click', () => {
+             closeModal(document.querySelector('.modal.modal-open'));
+        });
+    }
+     document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            closeModal(document.querySelector('.modal.modal-open'));
+        }
+    });
+    // --- End Modal Control Logic ---
 
 
     // --- Initialize ---
-    createVisualGrid(); // Build the grid structure
-    connectWebSocket(); // Connect to the server
+    createVisualGrid();
+    setupControlButtons();
+    connectWebSocket();
 
-}); // End of DOMContentLoaded
+}); // End of DOMContentLoaded wrapper

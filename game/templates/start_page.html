@@ -3,51 +3,136 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome - Conway's Game of Life</title>
     <style>
+         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap'); /* Import Google Font */
+
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #f2f2f2;
+             /* Use the imported font */
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            color: #343a40;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
             text-align: center;
-            padding: 50px;
+            overflow: hidden; /* Hide scrollbars during animation */
         }
+
+        /* Fade-in animation for the container */
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Simple pulse animation for the title maybe? */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .container {
+            padding: 50px 40px;
+            max-width: 650px;
+            background: rgba(255, 255, 255, 0.88); /* Slightly less transparent */
+            border-radius: 15px;
+            box-shadow: 0 8px 35px rgba(0, 0, 0, 0.15); /* Refined shadow */
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            /* Apply animation */
+            animation: fadeInScale 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; /* Smoother cubic-bezier timing */
+            opacity: 0; /* Start hidden */
+        }
+
         h1 {
-            font-size: 2.5em;
-            color: #333;
+            font-size: 3em;
+            color: #212529;
+            margin-bottom: 20px;
+            font-weight: 700; /* Bolder */
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.08);
+            /* Optional subtle animation */
+            /* animation: pulse 5s infinite ease-in-out; */
         }
-        p {
-            font-size: 1.2em;
-            color: #555;
+
+        .welcome-message {
+            font-size: 1.4em;
+            color: #495057;
+            margin-bottom: 45px;
+            font-weight: 400;
         }
-        button {
-            padding: 15px 30px;
-            font-size: 1.1em;
-            background-color: #008CBA;
+
+        .start-button {
+            display: inline-block;
+            padding: 18px 40px;
+            font-size: 1.3em;
+            font-weight: 600;
+            font-family: inherit; /* Use Poppins */
+            background-color: #198754; /* Bootstrap success green */
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
-            margin-top: 30px;
-            text-decoration: none; /* Ensure button looks right if inside <a> tag */
+            text-decoration: none;
+            transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+            box-shadow: 0 5px 15px rgba(25, 135, 84, 0.3); /* Adjusted shadow color */
         }
-        button:hover {
-            background-color: #0072a1;
+
+        .start-button:hover {
+            background-color: #157347; /* Darker green */
+            transform: translateY(-3px); /* More lift */
+            box-shadow: 0 8px 20px rgba(25, 135, 84, 0.35);
         }
-        a {
-            text-decoration: none; /* Remove underline from links */
+
+         .start-button:active {
+             background-color: #146c43;
+             transform: translateY(0px) scale(0.98);
+             box-shadow: 0 3px 10px rgba(25, 135, 84, 0.3);
         }
+
+        /* Suggestion: Add an icon to the button */
+        /* .start-button::before { content: '▶ '; } */
+
         .logout-link {
-            margin-top: 20px;
-            font-size: 0.9em;
+            margin-top: 50px;
+            font-size: 1em;
+        }
+
+        .logout-link a {
+            color: #6c757d;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            /* Suggestion: Add logout icon */
+            /* display: inline-flex; align-items: center; */
+        }
+        /* .logout-link a svg { margin-right: 5px; } */
+
+        .logout-link a:hover {
+            color: #343a40;
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <h1>Conway's Game of Life</h1>
-    <p>Welcome, {{ user.username }}!</p>
+    <div class="container">
+        <h1>Conway's Game of Life</h1>
+        <p class="welcome-message">Welcome, {{ user.username }}!</p>
 
-    <a href="{% url 'game:game' %}"><button>Start Game</button></a>
+        <a href="{% url 'game:game' %}" class="start-button">Start Game</a>
+         {# Suggestion: Add icon here -> <i class="fas fa-play"></i> Start Game #}
 
-    <p class="logout-link"><a href="{% url 'game:logout' %}">Logout</a></p>
+        <p class="logout-link">
+             <a href="{% url 'game:logout' %}">
+                 {# Suggestion: Add icon here -> <i class="fas fa-sign-out-alt"></i> Logout #}
+                 Logout
+             </a>
+        </p>
+    </div>
+     {# Suggestion: Add JavaScript for more complex interactions if needed #}
 </body>
 </html>

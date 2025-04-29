@@ -3,126 +3,303 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Conway's Game of Life - Play</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conway's Game of Life - Let's Play!</title>
     <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
-        /* Basic page layout styles */
+        /* Inline styles for page layout and theme - Restored Colorful Version */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap');
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #e9ecef; /* Light grey background */
-            color: #333;
+            font-family: 'Nunito', 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            color: #343a40;
             margin: 0;
             padding: 0;
             display: flex;
             flex-direction: column;
-            align-items: center;
             min-height: 100vh;
+            /* overflow: hidden; <- Let JS handle this via body.modal-active */
         }
+
         header {
-            background-color: #343a40; /* Dark header */
-            color: white;
+            background-color: rgba(30, 30, 40, 0.85);
+            backdrop-filter: blur(8px);
+            color: #f8f9fa;
             width: 100%;
-            padding: 15px 0;
+            padding: 18px 20px; /* Added horizontal padding */
             text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100; /* Header below modals */
+            box-sizing: border-box;
         }
+
         header h1 {
             margin: 0;
-            font-size: 2em;
+            font-size: 2.2em;
+            font-weight: 700;
+            letter-spacing: 1px;
+            display: inline-block;
+            vertical-align: middle;
         }
+
         .user-info {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 0.9em;
+            top: 50%;
+            right: 25px;
+            transform: translateY(-50%);
+            font-size: 0.95em;
+            display: flex;
+            align-items: center;
         }
-        .user-info a {
-            color: #adb5bd; /* Lighter link color */
+
+        .user-info span { /* Style username */
+            font-weight: 700;
+            margin-right: 15px;
+            color: #ffffff;
+        }
+
+        .user-info a { /* Logout link */
+            color: #ced4da;
             text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease, transform 0.2s ease;
+            display: inline-block;
             margin-left: 10px;
         }
+
         .user-info a:hover {
-            color: white;
+            color: #ffc107;
+            transform: scale(1.1);
         }
+
         main {
             flex: 1;
             width: 100%;
-            max-width: 1200px; /* Limit content width */
-            padding: 30px 20px;
+            max-width: 1200px;
+            padding: 40px 20px;
+            margin: 0 auto;
             display: flex;
             flex-direction: column;
             align-items: center;
+            box-sizing: border-box;
         }
+
         .game-container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.92);
+            padding: 35px;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
             text-align: center;
+            width: fit-content;
+            max-width: 100%;
+            box-sizing: border-box;
         }
+
         .game-description p {
-            font-size: 1.1em;
-            margin-bottom: 20px;
-            color: #555;
+            font-size: 1.2em;
+            margin-top: 0;
+            margin-bottom: 30px;
+            color: #333;
+            font-weight: 700;
         }
-        /* Placeholder for controls */
+
+        #grid { /* Refers to external styles for grid display/cells */
+             margin-bottom: 35px;
+        }
+
         .controls {
-            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
         }
+
+        /* Button wobble animation */
+        @keyframes wobble {
+          0%, 100% { transform: translateX(0%); }
+          15% { transform: translateX(-6px) rotate(-4deg); }
+          30% { transform: translateX(4px) rotate(3deg); }
+          45% { transform: translateX(-3px) rotate(-2deg); }
+          60% { transform: translateX(2px) rotate(1deg); }
+          75% { transform: translateX(-1px) rotate(-0.5deg); }
+        }
+
         .controls button {
-             padding: 8px 15px;
-             font-size: 0.9em;
-             margin: 0 5px;
-             background-color: #6c757d; /* Grey buttons */
-             color: white;
+             padding: 12px 30px;
+             font-size: 1.05rem;
+             font-weight: 700;
+             font-family: inherit;
              border: none;
-             border-radius: 5px;
+             border-radius: 10px;
              cursor: pointer;
+             transition: background 0.3s ease, transform 0.15s ease, box-shadow 0.2s ease;
+             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+             transform-origin: center bottom;
+             color: white;
+             text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
         }
-         .controls button:hover {
-             background-color: #5a6268;
-         }
+
+        .controls button:hover {
+             transform: scale(1.05);
+             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+             /* animation: wobble 0.8s ease; */
+        }
+         .controls button:active {
+             transform: scale(0.97);
+             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Specific button colors */
+        #start-button { background: linear-gradient(45deg, #28a745, #218838); }
+        #start-button:hover { background: linear-gradient(45deg, #34c759, #2ca049); }
+
+        #stop-button { background: linear-gradient(45deg, #dc3545, #c82333); }
+        #stop-button:hover { background: linear-gradient(45deg, #e74c3c, #d63031); }
+
+        #clear-button { background: linear-gradient(45deg, #6c757d, #5a6268); }
+        #clear-button:hover { background: linear-gradient(45deg, #7f8c8d, #6c7a89); }
+
 
         footer {
             text-align: center;
-            padding: 15px;
-            font-size: 0.8em;
-            color: #6c757d;
+            padding: 20px;
+            font-size: 0.9em;
+            color: #f8f9fa;
             width: 100%;
-            margin-top: auto; /* Push footer down */
+            margin-top: auto;
+            background-color: rgba(30, 30, 40, 0.85);
+            backdrop-filter: blur(8px);
+            box-sizing: border-box;
         }
+
+        /* Info Buttons in Header - Inline for this version */
+         .info-buttons {
+            display: inline-flex;
+            gap: 10px;
+            margin-right: 15px; /* Space before username */
+            vertical-align: middle;
+        }
+        .header-icon-btn {
+            background: none;
+            border: none;
+            color: #ced4da;
+            font-size: 1.4em;
+            cursor: pointer;
+            padding: 5px;
+            transition: color 0.2s ease, transform 0.2s ease;
+            line-height: 1;
+        }
+        .header-icon-btn:hover {
+            color: #ffc107;
+            transform: scale(1.2) rotate(5deg);
+        }
+        /* Styles for modals, grid, cells will be in styles.css */
     </style>
 </head>
 <body>
     <header>
         <h1>Conway's Game of Life</h1>
         <div class="user-info">
-            Welcome, {{ user.username }}!
-            <a href="{% url 'game:logout' %}">Logout</a>
+            <div class="info-buttons">
+                <button id="purpose-btn" class="header-icon-btn" title="Purpose of the Game">
+                    <i class="fas fa-info-circle"></i>
+                </button>
+                <button id="rules-btn" class="header-icon-btn" title="Game Rules">
+                     <i class="fas fa-book-open"></i>
+                </button>
+            </div>
+            <span class="user-name">Welcome, {{ user.username }}!</span>
+            <a href="{% url 'game:logout' %}" class="logout-link">Logout</a>
         </div>
     </header>
 
-    <main>
-        <div class="game-container">
-            <div class="game-description">
-                <p>Start the simulation!</p>
+    <main class="main-content">
+        <div class="game-area-container">
+             <p class="game-description"><p>Click cells to bring them to life!</p></p> <div id="grid" class="game-grid">
                 </div>
-
-            <div id="grid">
-                </div>
-
             <div class="controls">
-                <button id="start-button">Start</button>
-                <button id="stop-button">Stop</button>
-                <button id="clear-button">Clear</button>
+                <button id="start-button">Start Life</button>
+                <button id="stop-button">Pause Life</button>
+                <button id="clear-button">Reset World</button>
             </div>
         </div>
     </main>
 
-    <footer>
-        &copy; CSCI4830
+    <footer class="site-footer">
+        &copy; CSCI4830 - Watch the simulation unfold!
     </footer>
 
-    <script src="{% static 'game.js' %}"></script>
+    <div id="purpose-modal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close-btn" data-modal-id="purpose-modal" aria-label="Close Purpose Modal">&times;</button>
+            <h2 class="modal-title"><i class="fas fa-lightbulb"></i> The Purpose of Life</h2>
+            <div class="modal-body">
+                 <p>Conway's Game of Life's purpose is to demonstrate how <strong>complex patterns and behaviors can emerge from simple rules.</strong> It's a captivating example of a cellular automaton where cells evolve based on their neighbors, showcasing the fascinating concept of emergent complexity from basic initial conditions.</p>
+                 <hr>
+                 <div class="purpose-points">
+                     <div><i class="fas fa-project-diagram point-icon"></i><h3>Cellular Automaton</h3><p>A system where cells in a grid evolve based on rules depending on their neighbors' states.</p></div>
+                     <div><i class="fas fa-meteor point-icon"></i><h3>Emergence</h3><p>Complex, unpredictable patterns and behaviors arising from the interaction of simple, local rules.</p></div>
+                     <div><i class="fas fa-flask point-icon"></i><h3>Exploration</h3><p>A tool used in various fields (biology, physics, economics) to explore how simple rules create complex systems.</p></div>
+                     <div><i class="fas fa-sync-alt point-icon"></i><h3>Self-Organization</h3><p>The system organizes itself based purely on its internal rules, without external direction.</p></div>
+                     <div><i class="fas fa-puzzle-piece point-icon"></i><h3>Simplicity & Complexity</h3><p>Highlights how profoundly complex and unexpected results can stem from very simple foundations.</p></div>
+                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="rules-modal" class="modal">
+        <div class="modal-content">
+             <button class="modal-close-btn" data-modal-id="rules-modal" aria-label="Close Rules Modal">&times;</button>
+            <h2 class="modal-title"><i class="fas fa-scroll"></i> The Rules</h2>
+            <div class="modal-body">
+                 <p>Conway's Game of Life is governed by <strong>four simple rules</strong> that determine the state of each cell in the next generation, based on the number of its eight neighbours (horizontal, vertical, and diagonal) that are alive:</p>
+                 <ol class="rules-list detailed-rules">
+                     <li>
+                         <div class="rule-icon death"><i class="fas fa-ghost"></i></div>
+                         <div>
+                             <strong>Underpopulation:</strong> A <strong>live</strong> cell with <strong>fewer than two</strong> live neighbours <strong>dies</strong>.
+                         </div>
+                     </li>
+                      <li>
+                          <div class="rule-icon survival"><i class="fas fa-heartbeat"></i></div>
+                         <div>
+                             <strong>Survival:</strong> A <strong>live</strong> cell with <strong>two or three</strong> live neighbours <strong>lives on</strong> to the next generation.
+                         </div>
+                      </li>
+                     <li>
+                          <div class="rule-icon death"><i class="fas fa-users-slash"></i></div>
+                          <div>
+                             <strong>Overpopulation:</strong> A <strong>live</strong> cell with <strong>more than three</strong> live neighbours <strong>dies</strong>.
+                         </div>
+                      </li>
+                      <li>
+                         <div class="rule-icon birth"><i class="fas fa-baby"></i></div>
+                         <div>
+                             <strong>Birth:</strong> A <strong>dead</strong> cell with <strong>exactly three</strong> live neighbours becomes a <strong>live</strong> cell.
+                         </div>
+                     </li>
+                 </ol>
+                  <p>These rules are applied simultaneously to every cell on the grid at each step (or 'generation'). The initial pattern is the starting point.</p>
+             </div>
+        </div>
+    </div>
+
+     <div id="modal-backdrop" class="modal-backdrop"></div>
+     <script src="{% static 'game.js' %}"></script>
 </body>
 </html>

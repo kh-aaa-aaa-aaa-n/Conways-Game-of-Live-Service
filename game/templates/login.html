@@ -3,44 +3,164 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Conway’s Game of Life</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap'); /* Import Google Font */
+
         body {
-            font-family: Arial, sans-serif;
-            background: #e9ecef;
+            /* Use the imported font */
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #495057;
+            overflow: hidden; /* Hide scrollbars during animation */
+        }
+
+        /* Fade-in animation for the container */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
             text-align: center;
-            padding: 50px;
+            width: 100%;
+            max-width: 360px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+             /* Apply animation */
+            animation: fadeIn 0.6s ease-out forwards;
+            opacity: 0; /* Start hidden for animation */
         }
+
         h2 {
-            color: #333;
+            color: #343a40;
+            margin-bottom: 25px;
+            font-weight: 600;
+            font-size: 1.8em; /* Slightly larger heading */
         }
-        form {
-            display: inline-block;
-            padding: 20px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px #ccc;
+
+        form p {
+            margin-bottom: 18px; /* Increase spacing */
+            text-align: left;
+            position: relative; /* For potential icon placement */
         }
-        input[type="text"], input[type="password"] {
+
+        form label {
             display: block;
-            margin: 10px auto;
-            padding: 8px;
-            width: 200px;
+            margin-bottom: 6px; /* Slightly more space */
+            font-weight: 500;
+            color: #495057;
+            font-size: 0.95em;
         }
-        button {
-            padding: 8px 20px;
-            margin-top: 10px;
+
+        /* Suggestion: Add icons inside inputs later */
+        /* E.g., using background-image and padding-left */
+
+        form input[type="text"],
+        form input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            font-family: inherit; /* Ensure input uses the Poppins font */
+            background-color: rgba(255, 255, 255, 0.8);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease; /* Smooth transitions */
         }
+
+        form input:focus {
+             border-color: #86b7fe; /* Slightly different focus color */
+             outline: 0;
+             box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); /* Standard Bootstrap focus shadow */
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 1.05rem; /* Slightly larger font */
+            font-weight: 600;
+            font-family: inherit; /* Use Poppins font */
+            color: white;
+            background-color: #0d6efd; /* Bootstrap primary blue */
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+            margin-top: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle button shadow */
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0b5ed7; /* Darker blue */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
+            transform: translateY(-1px); /* Slight lift */
+        }
+
+        button[type="submit"]:active {
+             background-color: #0a58ca; /* Even darker blue */
+             transform: scale(0.99) translateY(0); /* Press effect */
+             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Suggestion: Add a loading spinner to the button during form submission via JS */
+
+        .register-link {
+            margin-top: 25px;
+            font-size: 0.9rem;
+        }
+
+        .register-link a {
+            color: #0d6efd;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* Improved Error Message Styling */
+        .errorlist {
+            color: #dc3545; /* Bootstrap danger color */
+            background-color: rgba(220, 53, 69, 0.1); /* Light red background */
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            list-style-type: none;
+            padding: 10px 15px; /* Add padding */
+            margin: 15px 0 10px 0; /* Adjust margins */
+            border-radius: 6px; /* Rounded corners */
+            font-size: 0.9rem;
+            text-align: left;
+        }
+        .errorlist li {
+            margin-bottom: 5px; /* Space between errors if multiple */
+        }
+         .errorlist li:last-child {
+            margin-bottom: 0;
+         }
     </style>
 </head>
 <body>
-    <h2>Login</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Login</button>
-    </form>
-    <p>Don't have an account? <a href="/register/">Register here</a></p>
+    <div class="login-container">
+        <h2>Login</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}  {# This renders the form fields including potential error lists #}
+            <button type="submit">Login</button>
+        </form>
+        <p class="register-link">Don't have an account? <a href="{% url 'game:register' %}">Register here</a></p>
+    </div>
+
+    {# Suggestion: Add JavaScript for loading indicators or more complex animations #}
 </body>
 </html>
-
