@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Learn More – Conway’s Game of Life</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f8;
+            color: #2c3e50;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 40px auto;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: #1a202c;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            margin-top: 25px;
+            color: #333;
+        }
+
+        p {
+            font-size: 1rem;
+            line-height: 1.7;
+            margin: 10px 0;
+        }
+
+        ul {
+            margin: 10px 0 20px 20px;
+        }
+
+        li {
+            line-height: 1.6;
+        }
+
+        a.button {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 10px 20px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        a.button:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Learn More About Conway’s Game of Life</h1>
+
+        <h2>1. What is Conway’s Game of Life?</h2>
+        <p>
+            Conway’s Game of Life is a famous example of a cellular automaton — a system made up of a grid of cells that evolve over time based on simple rules.
+            Developed by British mathematician John Conway in 1970, the Game of Life demonstrates how complex, dynamic behavior can emerge from simple, deterministic rules.
+        </p>
+        <p>
+            Each cell in the grid can be in one of two states: alive or dead. With each step of the simulation, the state of each cell is updated based on the number of live neighbors it has.
+            From these simple conditions, surprisingly complex patterns can form, including oscillators, spaceships (like the "glider"), and even self-replicating structures.
+        </p>
+
+        <h2>2. Core Rules</h2>
+        <p>The Game of Life operates on a grid of cells with the following simple rules:</p>
+        <ul>
+            <li>Any live cell with 2 or 3 live neighbors survives.</li>
+            <li>Any dead cell with exactly 3 live neighbors becomes alive.</li>
+            <li>All other cells die or stay dead.</li>
+        </ul>
+
+        <h2>3. Emergent Behavior</h2>
+        <p>
+            One of the most fascinating aspects of the Game of Life is how unexpected patterns emerge over time.
+            These include formations like gliders, glider guns, blinkers, and more — some that move, oscillate, or even replicate.
+        </p>
+
+        <h2>4. Real-World Applications</h2>
+        <p>
+            Although originally a mathematical curiosity, the Game of Life has become important in fields such as complexity theory, artificial life, and computational science.
+            It has also influenced graphics simulations and algorithm design in software engineering.
+        </p>
+
+        <h2>5. Computational Theory and Automata</h2>
+        <p>
+            The Game of Life is Turing complete, meaning it can simulate any computation with the right setup.
+            This links it directly to automata theory — where simple rules lead to powerful computational behaviors.
+        </p>
+
+        <h2>6. Real-Time Web Implementation</h2>
+        <p>
+            Our project uses WebSockets to allow real-time updates between users.
+            When one person changes the grid, everyone sees it immediately. Django Channels handles this behind the scenes.
+        </p>
+
+        <h2>7. Persistent State with a Database</h2>
+        <p>
+            We use PostgreSQL to store the state of the game, so even if the browser refreshes or users disconnect, the board state is saved and resumes right where it left off.
+        </p>
+
+        <h2>8. Scalable Cloud Deployment</h2>
+        <p>
+            The simulation is deployed to a cloud server (like AWS) for high availability, allowing many users to collaborate at once without lag or crashes.
+        </p>
+
+        <a class="button" href="{% url 'game:game' %}">← Back to the Game</a>
+    </div>
+</body>
+</html>
+
