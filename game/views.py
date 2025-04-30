@@ -1,11 +1,9 @@
-# game/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm
 from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-# Import your forms
 from .forms import UserUpdateForm, ProfileUpdateForm
 # Import Password views and reverse_lazy for redirects
 from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView
@@ -14,7 +12,6 @@ from django.urls import reverse_lazy
 from .models import UserProfile
 
 
-# --- Update views that need avatar URL ---
 
 @login_required
 def start_page_view(request):
@@ -52,12 +49,10 @@ def account_view(request):
 @login_required
 def edit_account_view(request):
     """Handles editing user and profile information."""
-    # Ensure profile exists, create if not (should be handled by signal, but safeguard)
     profile_instance, created = UserProfile.objects.get_or_create(user=request.user)
 
     if request.method == 'POST':
         u_form = UserUpdateForm(request.POST, instance=request.user)
-        # Use the fetched/created profile_instance
         p_form = ProfileUpdateForm(request.POST, instance=profile_instance)
 
         if u_form.is_valid() and p_form.is_valid():
@@ -83,7 +78,7 @@ def edit_account_view(request):
     return render(request, 'account/edit_account.html', context)
 
 
-# --- Password Change Views (using custom templates) ---
+# --- Password Change Views  ---
 class CustomPasswordChangeView(PasswordChangeView):
     template_name = 'account/password_change.html' # Your custom template
     success_url = reverse_lazy('game:password_change_done') # Redirect URL name after success
@@ -110,7 +105,6 @@ def delete_account_view(request):
     return render(request, 'account/delete_account_confirm.html', {'profile_avatar_url': avatar_url})
 
 
-# --- Keep existing Register, Login, Logout, Learn More views ---
 def register_view(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
@@ -133,8 +127,7 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            # Ensure profile exists after login (signal should handle creation, but good check)
-            # UserProfile.objects.get_or_create(user=user)
+           
             return redirect('game:start_page')
         else:
              messages.error(request, 'Invalid username or password.')
