@@ -46,3 +46,6 @@ def logout_view(request):
 def game_view(request):
     # This view now only handles the actual game grid page
     return render(request, 'game.html')
+
+def learn_more(request):
+    return render(request, 'learn_more.html')

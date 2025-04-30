@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         socket.onopen = function(e) {
             console.log("WebSocket connection established");
-            // socket.send(JSON.stringify({ action: "get_initial_state" }));
+            // socket.send(JSON.stringify({ action: "get_initial_state" })); // If needed
         };
 
         socket.onmessage = function(e) {
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateGridFromServer(data.grid);
             } else if (data.type === "error") {
                 console.error("Backend Error:", data.message);
-                // Consider using a custom, styled modal for errors instead of alert
+                // Consider using a custom, styled notification for errors instead of alert
                 alert("Error: " + data.message);
                 if (data.message.includes("wait")) {
                     timeoutActive = true;
@@ -73,6 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         const cell = event.target;
+        // Check if the clicked element is actually a cell and has coordinates
         if (cell.classList.contains('cell') && cell.dataset.x != null && cell.dataset.y != null) {
             const x = parseInt(cell.dataset.x, 10);
             const y = parseInt(cell.dataset.y, 10);
@@ -85,10 +86,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+
     // --- Create the Visual Grid Structure ---
     function createVisualGrid() {
         if (!gridContainer) { console.error("Grid container not found!"); return; }
-        gridContainer.innerHTML = '';
+        gridContainer.innerHTML = ''; // Clear previous grid if any
         gridContainer.style.setProperty('--grid-rows', rows);
         gridContainer.style.setProperty('--grid-cols', cols);
         gridContainer.style.gridTemplateColumns = `repeat(${cols}, auto)`;
@@ -98,16 +100,17 @@ document.addEventListener('DOMContentLoaded', function() {
             for (let c = 0; c < cols; c++) {
                 const cell = document.createElement('div');
                 cell.classList.add('cell');
-                cell.dataset.x = c;
+                cell.dataset.x = c; // Use dataset for coordinates
                 cell.dataset.y = r;
                 gridContainer.appendChild(cell);
             }
         }
-        // Ensure listener is added only once
-        if (!gridContainer.hasAttribute('listener-added')) {
+         // Add click listener to the grid container (event delegation)
+         // Ensure listener is added only once to prevent duplicates on potential re-renders
+         if (!gridContainer.hasAttribute('listener-added')) {
              gridContainer.addEventListener('click', handleCellClick);
              gridContainer.setAttribute('listener-added', 'true');
-        }
+         }
         console.log(`Created visual grid (${rows}x${cols}).`);
     }
 
@@ -129,70 +132,28 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
+        // Add listeners to control buttons
         for (const [buttonId, action] of Object.entries(buttons)) {
             const btn = document.getElementById(buttonId);
             if (btn) {
+                // Remove previous listener if any, to prevent duplicates
+                // btn.removeEventListener('click', () => sendControlAction(action)); // Simple removal might not work due to anonymous fn
+                // A safer approach is to ensure setupControlButtons is called only once, or use named functions/flags
                 btn.addEventListener('click', () => sendControlAction(action));
+            } else {
+                console.warn(`Button with ID ${buttonId} not found.`);
             }
         }
     }
 
-    // --- Modal Control Logic ---
-    const purposeModal = document.getElementById('purpose-modal');
-    const rulesModal = document.getElementById('rules-modal');
-    const modalBackdrop = document.getElementById('modal-backdrop');
-    const purposeBtn = document.getElementById('purpose-btn');
-    const rulesBtn = document.getElementById('rules-btn');
-    const closeBtns = document.querySelectorAll('.modal-close-btn');
-
-    function openModal(modal) {
-        if (modal) {
-            modal.classList.add('modal-open');
-            modalBackdrop.classList.add('modal-open');
-            document.body.classList.add('modal-active'); // <<< ADD THIS CLASS TO BODY
-        }
-    }
-
-    function closeModal(modal) {
-        if (modal) {
-            modal.classList.remove('modal-open');
-            const anyModalOpen = document.querySelector('.modal.modal-open');
-            if (!anyModalOpen) {
-                 modalBackdrop.classList.remove('modal-open');
-                 document.body.classList.remove('modal-active'); // <<< REMOVE THIS CLASS FROM BODY
-            }
-        }
-    }
-
-    if (purposeBtn && purposeModal) {
-        purposeBtn.addEventListener('click', (e) => { e.stopPropagation(); openModal(purposeModal); });
-    }
-    if (rulesBtn && rulesModal) {
-        rulesBtn.addEventListener('click', (e) => { e.stopPropagation(); openModal(rulesModal); });
-    }
-    closeBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const modalId = btn.getAttribute('data-modal-id');
-            closeModal(document.getElementById(modalId));
-        });
-    });
-    if (modalBackdrop) {
-        modalBackdrop.addEventListener('click', () => {
-             closeModal(document.querySelector('.modal.modal-open'));
-        });
-    }
-     document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') {
-            closeModal(document.querySelector('.modal.modal-open'));
-        }
-    });
-    // --- End Modal Control Logic ---
-
+    // --- Modal Control Logic Removed ---
+    // Variables for modals, backdrop, buttons removed
+    // openModal, closeModal functions removed
+    // Event listeners for modal buttons, backdrop, and Escape key removed
 
     // --- Initialize ---
     createVisualGrid();
-    setupControlButtons();
-    connectWebSocket();
+    setupControlButtons(); // Setup listeners for start/stop/clear
+    connectWebSocket(); // Establish WebSocket connection
 
 }); // End of DOMContentLoaded wrapper

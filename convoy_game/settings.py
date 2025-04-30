@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import requests
 import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +26,15 @@ SECRET_KEY = 'django-insecure-+*s58wa233kmc2m4qufd05gao_3c3bst1(y=sotrc0!ebbgv*0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+def get_public_ip():
+    try:
+        response = requests.get('http://169.254.169.254/latest/meta-data/public-ipv4', timeout=1)
+        return response.text.strip() if response.status_code == 200 else None
+    except requests.RequestException:
+        return None
+
+public_ip = get_public_ip()
+ALLOWED_HOSTS = [public_ip] if public_ip else []
 
 
 # Application definition

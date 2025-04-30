@@ -29,7 +29,6 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            /* overflow: hidden; <- Let JS handle this via body.modal-active */
         }
 
         header {
@@ -42,7 +41,7 @@
             box-shadow: 0 3px 10px rgba(0,0,0,0.2);
             position: sticky;
             top: 0;
-            z-index: 100; /* Header below modals */
+            z-index: 100;
             box-sizing: border-box;
         }
 
@@ -67,7 +66,7 @@
 
         .user-info span { /* Style username */
             font-weight: 700;
-            margin-right: 15px;
+            margin-right: 15px; /* Adjusted margin */
             color: #ffffff;
         }
 
@@ -97,7 +96,7 @@
             box-sizing: border-box;
         }
 
-        .game-container {
+        .game-container { /* Renamed from game-area-container for clarity */
             background: rgba(255, 255, 255, 0.92);
             padding: 35px;
             border-radius: 15px;
@@ -110,7 +109,7 @@
             box-sizing: border-box;
         }
 
-        .game-description p {
+        .game-description p { /* Adjusted selector */
             font-size: 1.2em;
             margin-top: 0;
             margin-bottom: 30px;
@@ -157,7 +156,7 @@
         .controls button:hover {
              transform: scale(1.05);
              box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-             /* animation: wobble 0.8s ease; */
+             /* animation: wobble 0.8s ease; */ /* Optional wobble on hover */
         }
          .controls button:active {
              transform: scale(0.97);
@@ -174,6 +173,25 @@
         #clear-button { background: linear-gradient(45deg, #6c757d, #5a6268); }
         #clear-button:hover { background: linear-gradient(45deg, #7f8c8d, #6c7a89); }
 
+        /* Styling for the 'Learn More' button link */
+        .learn-more-link button {
+            background: linear-gradient(45deg, #0dcaf0, #0a9cb5); /* Example: Info blue gradient */
+            padding: 10px 25px; /* Slightly smaller */
+            font-size: 1rem;
+        }
+        .learn-more-link button:hover {
+             background: linear-gradient(45deg, #34d3f5, #0daac4);
+             transform: scale(1.05); /* Keep hover effect consistent */
+             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+         .learn-more-link button:active {
+             transform: scale(0.97);
+             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+        }
+         .learn-more-link a { /* Remove default link underline */
+            text-decoration: none;
+         }
+
 
         footer {
             text-align: center;
@@ -186,56 +204,31 @@
             backdrop-filter: blur(8px);
             box-sizing: border-box;
         }
-
-        /* Info Buttons in Header - Inline for this version */
-         .info-buttons {
-            display: inline-flex;
-            gap: 10px;
-            margin-right: 15px; /* Space before username */
-            vertical-align: middle;
-        }
-        .header-icon-btn {
-            background: none;
-            border: none;
-            color: #ced4da;
-            font-size: 1.4em;
-            cursor: pointer;
-            padding: 5px;
-            transition: color 0.2s ease, transform 0.2s ease;
-            line-height: 1;
-        }
-        .header-icon-btn:hover {
-            color: #ffc107;
-            transform: scale(1.2) rotate(5deg);
-        }
-        /* Styles for modals, grid, cells will be in styles.css */
+        /* Modal related styles removed from here, rely on styles.css */
     </style>
 </head>
 <body>
     <header>
         <h1>Conway's Game of Life</h1>
         <div class="user-info">
-            <div class="info-buttons">
-                <button id="purpose-btn" class="header-icon-btn" title="Purpose of the Game">
-                    <i class="fas fa-info-circle"></i>
-                </button>
-                <button id="rules-btn" class="header-icon-btn" title="Game Rules">
-                     <i class="fas fa-book-open"></i>
-                </button>
-            </div>
             <span class="user-name">Welcome, {{ user.username }}!</span>
             <a href="{% url 'game:logout' %}" class="logout-link">Logout</a>
         </div>
     </header>
 
     <main class="main-content">
-        <div class="game-area-container">
-             <p class="game-description"><p>Click cells to bring them to life!</p></p> <div id="grid" class="game-grid">
+        <div class="game-container"> <div class="game-description"> <p>Click cells to bring them to life!</p>
+             </div>
+             <div id="grid" class="game-grid">
                 </div>
             <div class="controls">
                 <button id="start-button">Start Life</button>
                 <button id="stop-button">Pause Life</button>
                 <button id="clear-button">Reset World</button>
+            </div>
+            <div class="controls learn-more-link" style="text-align: center; margin-top: 25px;"> <a href="{% url 'game:learn_more' %}">
+                    <button>Learn More</button>
+                </a>
             </div>
         </div>
     </main>
@@ -244,62 +237,6 @@
         &copy; CSCI4830 - Watch the simulation unfold!
     </footer>
 
-    <div id="purpose-modal" class="modal">
-        <div class="modal-content">
-            <button class="modal-close-btn" data-modal-id="purpose-modal" aria-label="Close Purpose Modal">&times;</button>
-            <h2 class="modal-title"><i class="fas fa-lightbulb"></i> The Purpose of Life</h2>
-            <div class="modal-body">
-                 <p>Conway's Game of Life's purpose is to demonstrate how <strong>complex patterns and behaviors can emerge from simple rules.</strong> It's a captivating example of a cellular automaton where cells evolve based on their neighbors, showcasing the fascinating concept of emergent complexity from basic initial conditions.</p>
-                 <hr>
-                 <div class="purpose-points">
-                     <div><i class="fas fa-project-diagram point-icon"></i><h3>Cellular Automaton</h3><p>A system where cells in a grid evolve based on rules depending on their neighbors' states.</p></div>
-                     <div><i class="fas fa-meteor point-icon"></i><h3>Emergence</h3><p>Complex, unpredictable patterns and behaviors arising from the interaction of simple, local rules.</p></div>
-                     <div><i class="fas fa-flask point-icon"></i><h3>Exploration</h3><p>A tool used in various fields (biology, physics, economics) to explore how simple rules create complex systems.</p></div>
-                     <div><i class="fas fa-sync-alt point-icon"></i><h3>Self-Organization</h3><p>The system organizes itself based purely on its internal rules, without external direction.</p></div>
-                     <div><i class="fas fa-puzzle-piece point-icon"></i><h3>Simplicity & Complexity</h3><p>Highlights how profoundly complex and unexpected results can stem from very simple foundations.</p></div>
-                 </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="rules-modal" class="modal">
-        <div class="modal-content">
-             <button class="modal-close-btn" data-modal-id="rules-modal" aria-label="Close Rules Modal">&times;</button>
-            <h2 class="modal-title"><i class="fas fa-scroll"></i> The Rules</h2>
-            <div class="modal-body">
-                 <p>Conway's Game of Life is governed by <strong>four simple rules</strong> that determine the state of each cell in the next generation, based on the number of its eight neighbours (horizontal, vertical, and diagonal) that are alive:</p>
-                 <ol class="rules-list detailed-rules">
-                     <li>
-                         <div class="rule-icon death"><i class="fas fa-ghost"></i></div>
-                         <div>
-                             <strong>Underpopulation:</strong> A <strong>live</strong> cell with <strong>fewer than two</strong> live neighbours <strong>dies</strong>.
-                         </div>
-                     </li>
-                      <li>
-                          <div class="rule-icon survival"><i class="fas fa-heartbeat"></i></div>
-                         <div>
-                             <strong>Survival:</strong> A <strong>live</strong> cell with <strong>two or three</strong> live neighbours <strong>lives on</strong> to the next generation.
-                         </div>
-                      </li>
-                     <li>
-                          <div class="rule-icon death"><i class="fas fa-users-slash"></i></div>
-                          <div>
-                             <strong>Overpopulation:</strong> A <strong>live</strong> cell with <strong>more than three</strong> live neighbours <strong>dies</strong>.
-                         </div>
-                      </li>
-                      <li>
-                         <div class="rule-icon birth"><i class="fas fa-baby"></i></div>
-                         <div>
-                             <strong>Birth:</strong> A <strong>dead</strong> cell with <strong>exactly three</strong> live neighbours becomes a <strong>live</strong> cell.
-                         </div>
-                     </li>
-                 </ol>
-                  <p>These rules are applied simultaneously to every cell on the grid at each step (or 'generation'). The initial pattern is the starting point.</p>
-             </div>
-        </div>
-    </div>
-
-     <div id="modal-backdrop" class="modal-backdrop"></div>
-     <script src="{% static 'game.js' %}"></script>
+    <script src="{% static 'game.js' %}"></script>
 </body>
 </html>
