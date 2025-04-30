@@ -1,37 +1,25 @@
-{% extends "base_template.html" %} {# ADDED: Extend the base template #}
+{% extends "base_template.html" %} {# Assumes base_template provides header/footer/base CSS #}
 {% load static %}
 
-{% block title %}Conway's Game of Life - Let's Play!{% endblock %} {# ADDED: Define title block #}
+{% block title %}Conway's Game of Life - Let's Play!{% endblock %}
 
-{% block extra_css %} {# ADDED: Define CSS block #}
-    {# Link the main styles.css (also linked in base, but good practice) #}
+{% block extra_css %}
+    {# Link the main styles.css if not already in base #}
     <link rel="stylesheet" href="{% static 'styles.css' %}">
-    {# Font Awesome is already linked in base_template.html #}
+    {# Font Awesome is assumed to be linked in base_template.html for icons #}
     <style>
-        /* --- Styles specific to the game page content --- */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap');
 
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        @keyframes wobble {
-          0%, 100% { transform: translateX(0%); }
-          15% { transform: translateX(-6px) rotate(-4deg); }
-          30% { transform: translateX(4px) rotate(3deg); }
-          45% { transform: translateX(-3px) rotate(-2deg); }
-          60% { transform: translateX(2px) rotate(1deg); }
-          75% { transform: translateX(-1px) rotate(-0.5deg); }
-        }
+        @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes wobble { 0%, 100% { transform: translateX(0%); } 15% { transform: translateX(-6px) rotate(-4deg); } 30% { transform: translateX(4px) rotate(3deg); } 45% { transform: translateX(-3px) rotate(-2deg); } 60% { transform: translateX(2px) rotate(1deg); } 75% { transform: translateX(-1px) rotate(-0.5deg); } }
 
-        .game-main-content { /* Use a specific class if needed */
-            flex: 1;
+        .game-main-content {
+            flex: 1; 
             width: 100%;
-            max-width: 1200px;
-            padding: 40px 20px;
-            margin: 0 auto;
+            max-width: 1200px; 
+            padding: 30px 20px; 
+            margin: 20px auto; /* Centering and vertical margin */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -40,88 +28,134 @@
 
         .game-container {
             background: rgba(255, 255, 255, 0.92);
-            padding: 35px;
+            padding: 30px 35px; /* Padding inside container */
             border-radius: 15px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
             backdrop-filter: blur(6px);
             border: 1px solid rgba(255, 255, 255, 0.25);
             text-align: center;
-            width: fit-content;
-            max-width: 100%;
+            width: fit-content; /* Adjust width to content */
+            max-width: 100%; /* Prevent overflow on small screens */
             box-sizing: border-box;
         }
         .game-description p {
-            font-size: 1.2em;
+            font-size: 1.15em; /* Slightly smaller */
             margin-top: 0;
-            margin-bottom: 30px;
+            margin-bottom: 25px; /* Spacing below description */
             color: #333;
-            font-weight: 700;
+            font-weight: 600; /* Slightly less bold */
+            font-family: 'Poppins', sans-serif;
         }
         #grid {
-             margin-bottom: 35px;
+             display: grid; /* Use grid layout */
+             border: 1px solid #ccc;
+             margin: 0 auto 30px auto; /* Center grid and add bottom margin */
+             width: fit-content; /* Fit grid to cell sizes */
+             background-color: #f0f0f0; /* Light background for the grid area */
         }
-        .controls { /* Keep general controls styling */
+        .cell {
+            width: 25px; 
+            height: 25px; 
+            border: 1px solid #eee; /* Lighter cell borders */
+            background-color: white; /* Dead cell color */
+            cursor: pointer;
+            transition: background-color 0.1s ease-in-out;
+        }
+        .cell.alive {
+            background-color: #333; /* Live cell color */
+            border-color: #555;
+        }
+        .controls, .save-load-controls {
             display: flex;
             justify-content: center;
-            flex-wrap: wrap;
-            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+            gap: 15px; /* Spacing between controls */
+            margin-bottom: 20px; /* Space below control sections */
         }
-        .controls button {
-             padding: 12px 30px;
-             font-size: 1.05rem;
-             font-weight: 700;
-             font-family: inherit;
+        .save-load-controls {
+            flex-direction: column; /* Stack save/load sections */
+            align-items: stretch; /* Make inner divs full width */
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+            margin-top: 20px;
+            gap: 10px; /* Spacing within save/load */
+        }
+        .save-load-controls > div { /* Style direct children divs */
+             display: flex;
+             gap: 10px;
+             justify-content: center;
+             align-items: center;
+             flex-wrap: wrap;
+        }
+        .controls button, .save-load-controls button, .learn-more-link button {
+             padding: 10px 20px; 
+             font-size: 0.95rem; /* Slightly smaller font */
+             font-weight: 600; 
+             font-family: 'Nunito', sans-serif;
              border: none;
-             border-radius: 10px;
+             border-radius: 8px; /* Slightly less rounded */
              cursor: pointer;
              transition: background 0.3s ease, transform 0.15s ease, box-shadow 0.2s ease;
-             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-             transform-origin: center bottom;
+             box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
              color: white;
-             text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
+             text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
+             display: inline-flex; 
+             align-items: center;
+             gap: 5px; 
         }
-        .controls button:hover {
-             transform: scale(1.05);
-             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+         .controls button:hover, .save-load-controls button:hover, .learn-more-link button:hover {
+             transform: translateY(-2px); /* Subtle lift effect */
+             box-shadow: 0 5px 12px rgba(0, 0, 0, 0.18);
         }
-         .controls button:active {
-             transform: scale(0.97);
+         .controls button:active, .save-load-controls button:active, .learn-more-link button:active {
+             transform: translateY(0);
              box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
         }
+         /* Specific button colors */
         #start-button { background: linear-gradient(45deg, #28a745, #218838); }
         #start-button:hover { background: linear-gradient(45deg, #34c759, #2ca049); }
-        #stop-button { background: linear-gradient(45deg, #dc3545, #c82333); }
-        #stop-button:hover { background: linear-gradient(45deg, #e74c3c, #d63031); }
-        #clear-button { background: linear-gradient(45deg, #6c757d, #5a6268); }
-        #clear-button:hover { background: linear-gradient(45deg, #7f8c8d, #6c7a89); }
+        #stop-button { background: linear-gradient(45deg, #ffc107, #e0a800); } 
+        #stop-button:hover { background: linear-gradient(45deg, #ffca2c, #f0b400); }
+        #clear-button { background: linear-gradient(45deg, #dc3545, #c82333); } 
+        #clear-button:hover { background: linear-gradient(45deg, #e74c3c, #d63031); }
+        #save-state-button { background: linear-gradient(45deg, #0d6efd, #0a58ca); } /* Primary/Blue */
+        #save-state-button:hover { background: linear-gradient(45deg, #3b82f6, #1e6fd9); }
+        #load-state-button { background: linear-gradient(45deg, #198754, #146c43); } /* Success/Green */
+        #load-state-button:hover { background: linear-gradient(45deg, #20a764, #1a8751); }
+        #refresh-saves-button { background: linear-gradient(45deg, #6c757d, #5a6268); padding: 10px 12px; } /* Secondary/Grey */
+        #refresh-saves-button:hover { background: linear-gradient(45deg, #7f8c8d, #6c7a89); }
 
-        /* --- Style the Learn More button separately if needed --- */
+        
+        .save-load-controls input[type="text"], .save-load-controls select {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-family: 'Nunito', sans-serif;
+            min-width: 150px; 
+            box-sizing: border-box;
+        }
+
+        #save-load-feedback {
+            margin-top: 10px;
+            font-size: 0.9em;
+            font-weight: 500;
+            min-height: 1.2em; 
+        }
+        .feedback-success { color: #198754; }
+        .feedback-error { color: #dc3545; }
+
+        
         .learn-more-link {
             text-align: center;
             margin-top: 25px;
         }
-        .learn-more-link button {
-            background: linear-gradient(45deg, #0dcaf0, #0a9cb5);
-            padding: 10px 25px;
-            font-size: 1rem;
-            font-weight: 700; /* Added */
-             font-family: inherit; /* Added */
-             border: none; /* Added */
-             border-radius: 10px; /* Added */
-             cursor: pointer; /* Added */
-             transition: background 0.3s ease, transform 0.15s ease, box-shadow 0.2s ease; /* Added */
-             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Added */
-             color: white; /* Added */
-             text-shadow: 1px 1px 1px rgba(0,0,0,0.2); /* Added */
+        .learn-more-link button { 
+            background: linear-gradient(45deg, #0dcaf0, #0a9cb5); 
         }
         .learn-more-link button:hover {
              background: linear-gradient(45deg, #34d3f5, #0daac4);
-             transform: scale(1.05);
-             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-        }
-         .learn-more-link button:active {
-             transform: scale(0.97);
-             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
         }
          .learn-more-link a {
             text-decoration: none;
@@ -130,39 +164,63 @@
 {% endblock %}
 
 
-{% block content %} {# ADDED: Wrap content in block #}
-    {# Removed <header> as it comes from base_template.html #}
-    <main class="game-main-content"> {# Changed class from main-content #}
+{% block content %}
+    <main class="game-main-content">
         <div class="game-container">
              <div class="game-description">
-                 <p>Click cells to bring them to life!</p>
-             </div>
-             <div id="grid" class="game-grid">
-                {# Grid generated by JS #}
+                 <p>Click cells to bring them to life or load a saved state!</p>
              </div>
 
-            {# --- START: Conditional Admin Controls (Check Username) --- #}
-            {% if user.is_authenticated and user.username == "Admin" %}  {# <<<--- CHECK USERNAME HERE #}
+             {# Game Grid - generated by JS #}
+             <div id="grid" class="game-grid"></div>
+
+             {# Status Indicator #}
+             <div id="simulation-status" style="margin-bottom: 15px; font-weight: bold;">Status: Paused</div>
+
+
+            {# --- Conditional Admin Controls --- #}
+            {% if user.is_authenticated and user.username == "Admin" %}
                 <div class="controls">
-                    <button id="start-button">Start Life</button>
-                    <button id="stop-button">Pause Life</button>
-                    <button id="clear-button">Reset World</button>
+                    {# Using Font Awesome Icons as examples #}
+                    <button id="start-button" title="Start Simulation"><i class="fas fa-play"></i> Start</button>
+                    <button id="stop-button" title="Pause Simulation"><i class="fas fa-pause"></i> Pause</button>
+                    <button id="clear-button" title="Clear Grid & Pause"><i class="fas fa-trash"></i> Reset</button>
                 </div>
             {% endif %}
-            {# --- END: Conditional Admin Controls --- #}
 
-            {# Learn More button is always visible #}
+            {# --- Save / Load Controls (Authenticated Users Only) --- #}
+            {% if user.is_authenticated %}
+                <div class="save-load-controls">
+                    <h4><i class="fas fa-save"></i> Save / <i class="fas fa-folder-open"></i> Load State</h4>
+                    <div>
+                        <input type="text" id="save-name-input" placeholder="Enter save name">
+                        <button id="save-state-button"><i class="fas fa-save"></i> Save</button>
+                    </div>
+                    <div>
+                        <select id="load-state-select">
+                            <option value="">-- Select state to load --</option>
+                            {# Options populated by JS #}
+                        </select>
+                        <button id="load-state-button"><i class="fas fa-folder-open"></i> Load</button>
+                        <button id="refresh-saves-button" title="Refresh list"><i class="fas fa-sync-alt"></i></button>
+                    </div>
+                    <div id="save-load-feedback"></div> {# Area for feedback messages #}
+                </div>
+            {% endif %}
+
+            {# --- Learn More Link (Always Visible) --- #}
             <div class="learn-more-link">
                  <a href="{% url 'game:learn_more' %}">
-                    <button>Learn More</button>
+                    <button><i class="fas fa-info-circle"></i> Learn More</button>
                  </a>
             </div>
         </div>
     </main>
-    {# Removed <footer> as it comes from base_template.html #}
 {% endblock %}
 
 
-{% block extra_js %} {# ADDED: Define JS block #}
+{% block extra_js %}
+    {# Ensure Font Awesome is loaded if not in base template #}
+    {# <script src="https://kit.fontawesome.com/your-kit-code.js" crossorigin="anonymous"></script> #}
     <script src="{% static 'game.js' %}"></script>
 {% endblock %}
