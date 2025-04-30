@@ -2,3 +2,4 @@
 /env_webproject
 /venv
 __pycache__
+.DS_Store
