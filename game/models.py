@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 import os
-import json
+import json # Make sure this import is present (it was likely added with SavedGameState)
 
 
 AVATAR_FILENAMES = [
@@ -43,18 +43,18 @@ class UserProfile(models.Model):
 @receiver(post_save, sender=User)
 def create_or_update_user_profile(sender, instance, created, **kwargs):
     if created:
-        UserProfile.objects.create(user=instance) # Creates profile with default avatar
+        # This is the line kept from the conflict resolution
+        UserProfile.objects.create(user=instance)
 
 
-
-
+# This is the model kept from the conflict resolution (frontend-adc branch)
 class SavedGameState(models.Model):
     """
     Represents a saved state of the Conway's Game of Life grid for a user.
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='saved_game_states')
     name = models.CharField(max_length=100)
-  
+
     grid_state_json = models.TextField(help_text="Stores the grid state as a JSON string (e.g., list of live cell coordinates)")
     timestamp = models.DateTimeField(auto_now_add=True)
 
