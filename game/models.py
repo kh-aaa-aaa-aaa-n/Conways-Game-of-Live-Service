@@ -1,12 +1,11 @@
-# game/models.py
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 import os
 
-# --- IMPORTANT: Update this list to match your exact filenames ---
-# Assuming you have: default_avatar.png, avatar1.png, avatar2.png, avatar3.png
+
 AVATAR_FILENAMES = [
     'default_avatar.png',
     'avatar1.png',
@@ -14,7 +13,7 @@ AVATAR_FILENAMES = [
     'avatar3.png',
     'avatar4.png'
 ]
-# --- End of update section ---
+
 
 # Create choices tuple for the model field
 AVATAR_CHOICES = [(fname, fname.split('.')[0].replace('_', ' ').title()) for fname in AVATAR_FILENAMES]
@@ -48,6 +47,4 @@ class UserProfile(models.Model):
 @receiver(post_save, sender=User)
 def create_or_update_user_profile(sender, instance, created, **kwargs):
     if created:
-        UserProfile.objects.create(user=instance) # Creates profile with default avatar
-    # Ensure profile exists for updates if needed elsewhere, but usually handled by user interaction
-    # getattr(instance, 'profile', None) or UserProfile.objects.create(user=instance)
+        UserProfile.objects.create(user=instance) 
