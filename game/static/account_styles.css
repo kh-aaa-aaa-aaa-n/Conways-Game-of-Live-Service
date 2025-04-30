@@ -1,0 +1,204 @@
+
+:root {
+    --primary-glow: #00f2ff;
+    --secondary-glow: #ffc107;
+    --background-start: rgba(25, 30, 55, 0.85);
+    --background-end: rgba(45, 50, 80, 0.9);
+    --glass-background: rgba(255, 255, 255, 0.08);
+    --border-color: rgba(255, 255, 255, 0.2);
+    --text-color: #e0eaff;
+    --heading-color: var(--secondary-glow);
+    --link-color: var(--primary-glow);
+    --button-radius: 12px;
+    --container-padding: 35px 45px;
+}
+
+.futuristic-style {
+    background: linear-gradient(140deg, var(--background-start), var(--background-end));
+    padding: var(--container-padding);
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), 0 0 15px rgba(var(--primary-glow), 0.1);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    margin-bottom: 30px;
+    opacity: 0;
+    animation: fadeInContainer 0.6s ease-out forwards;
+    max-width: 900px; /* Example max-width for account pages */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@keyframes fadeInContainer {
+    from { opacity: 0; transform: translateY(15px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.futuristic-style h1, .futuristic-style h2 {
+    color: var(--heading-color);
+    text-shadow: 0 0 8px rgba(var(--secondary-glow), 0.5);
+    margin-bottom: 25px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    display: flex; /* Align icon and text */
+    align-items: center;
+}
+.futuristic-style h1 { font-size: 2.5em; justify-content: center; } /* Center main heading */
+.futuristic-style h2 { font-size: 1.8em; border-bottom: 1px solid rgba(var(--secondary-glow), 0.3); padding-bottom: 10px; margin-top: 30px; }
+.futuristic-style h2 .icon { margin-right: 15px; font-size: 0.9em; } /* Style icons in headings */
+
+
+.futuristic-style p { line-height: 1.7; font-size: 1.05em; margin-bottom: 12px; }
+.futuristic-style strong { color: var(--secondary-glow); font-weight: 600; }
+.futuristic-style a { color: var(--link-color); text-decoration: none; transition: color 0.3s ease, text-shadow 0.3s ease; }
+.futuristic-style a:hover { color: #fff; text-shadow: 0 0 10px var(--link-color); }
+.futuristic-style i, .futuristic-style em { /* Style for italic hints */
+    color: #a0b0ff;
+    font-style: italic;
+}
+
+/* Sections within account page */
+.account-section {
+    margin-bottom: 35px;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+    border-left: 3px solid var(--primary-glow);
+}
+
+/* Profile Pictures  */
+.profile-pic-large {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 4px solid var(--primary-glow);
+    box-shadow: 0 0 20px rgba(var(--primary-glow), 0.4);
+    object-fit: cover;
+    margin-bottom: 20px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+.profile-pic-medium {
+     width: 100px;
+     height: 100px;
+     border-radius: 50%;
+     border: 3px solid var(--secondary-glow);
+     box-shadow: 0 0 15px rgba(var(--secondary-glow), 0.3);
+     object-fit: cover;
+     margin-bottom: 15px;
+}
+
+
+/* Account Page Specific */
+.account-header { text-align: center; margin-bottom: 40px; border-bottom: none; background: none; padding: 0; border-left: none; } /* Remove section styling */
+.account-header .email { font-size: 1.1em; color: #a0b0ff; margin-top: -15px; }
+.account-actions { text-align: center; background: none; border-left: none; padding-top: 20px; }
+.account-actions .btn { margin: 10px; }
+
+
+/* Edit Account & Forms */
+.edit-account-container legend { /* Style fieldset legends */
+    font-size: 1.4em;
+    color: var(--secondary-glow);
+    margin-bottom: 15px;
+    font-weight: 600;
+    padding: 0 10px;
+    border-bottom: none; /* Remove border from h2 style if legend inherits it */
+    display: inline-block; /* Prevent full width */
+    width: auto;
+}
+.form-section { /* Style fieldsets */
+    border: 1px solid var(--border-color);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 30px;
+    background-color: var(--glass-background);
+    border-left: none; /* Override section style */
+}
+.form-field-group { margin-bottom: 20px; } /* Group labels and inputs */
+.current-profile-pic { text-align: center; margin-bottom: 25px; }
+.current-profile-pic h3 { color: var(--text-color); margin-bottom: 10px; font-size: 1.2em; border: none; padding: 0; display: block; text-align: center;}
+
+
+.futuristic-style form label { display: block; margin-bottom: 8px; font-weight: 500; color: #c0d0ff; }
+.futuristic-style form input[type="text"],
+.futuristic-style form input[type="email"],
+.futuristic-style form input[type="password"],
+.futuristic-style form input[type="url"], /* Add URL if needed */
+.futuristic-style form textarea, /* Add textarea */
+.futuristic-style form select { /* Add select if needed */
+    width: 100%;
+    padding: 12px 18px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--button-radius);
+    background-color: rgba(0, 0, 0, 0.2);
+    color: var(--text-color);
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.futuristic-style form textarea { line-height: 1.5; } /* Improve textarea readability */
+
+.futuristic-style form input:focus,
+.futuristic-style form textarea:focus,
+.futuristic-style form select:focus {
+    outline: none;
+    border-color: var(--primary-glow);
+    box-shadow: 0 0 15px rgba(var(--primary-glow), 0.3);
+}
+.form-help-text { font-size: 0.85em; color: #a0b0ff; display: block; margin-top: 5px; }
+.form-errors { margin-top: 5px; }
+.error-text { color: #ff6b79; font-size: 0.9em; font-weight: bold; }
+
+
+/* Avatar Selection Styling */
+.avatar-choices { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-top: 15px; }
+.avatar-choice-label { display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 10px; border: 2px solid transparent; border-radius: 10px; transition: border-color 0.3s ease, background-color 0.3s ease; background-color: rgba(255, 255, 255, 0.05); }
+.avatar-choice-label:hover { background-color: rgba(255, 255, 255, 0.1); border-color: var(--border-color); }
+.avatar-choice-label input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; } /* Hide radio */
+.avatar-preview { width: 70px; height: 70px; border-radius: 50%; margin-bottom: 8px; object-fit: cover; border: 2px solid var(--border-color); }
+.avatar-choice-label span { font-size: 0.9em; color: var(--text-color); text-align: center; }
+/* Use :has pseudo-class if browser support is sufficient, otherwise JS might be needed for checkmark */
+.avatar-choice-label:has(input[type="radio"]:checked) {
+   border-color: var(--primary-glow);
+   box-shadow: 0 0 10px rgba(var(--primary-glow), 0.5);
+}
+.avatar-choice-label:has(input[type="radio"]:checked) span {
+   color: var(--primary-glow);
+   font-weight: bold;
+}
+
+
+
+/* Form Actions (Buttons) */
+.form-actions { text-align: center; margin-top: 30px; }
+.form-actions .btn { margin: 0 10px; }
+
+
+/* Futuristic Button Style */
+.futuristic-button { padding: 12px 28px; border-radius: var(--button-radius); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; position: relative; overflow: hidden; z-index: 1; transition: color 0.4s ease, transform 0.2s ease, box-shadow 0.3s ease; border: 1px solid transparent; cursor: pointer; text-decoration: none; display: inline-block; }
+.futuristic-button::before { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; background: rgba(255, 255, 255, 0.15); border-radius: 50%; transform: translate(-50%, -50%); transition: width 0.4s ease, height 0.4s ease; z-index: -1; }
+.futuristic-button:hover::before { width: 250%; height: 500px; }
+.futuristic-button:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
+.futuristic-button:active { transform: translateY(0px) scale(0.98); }
+.futuristic-button.btn-primary { background: linear-gradient(45deg, #007bff, #0056b3); color: white; border-color: #0056b3; }
+.futuristic-button.btn-primary:hover { border-color: var(--primary-glow); box-shadow: 0 0 15px rgba(var(--primary-glow), 0.4); }
+.futuristic-button.btn-secondary { background: linear-gradient(45deg, #6c757d, #495057); color: white; border-color: #495057; }
+.futuristic-button.btn-secondary:hover { border-color: #adb5bd; box-shadow: 0 0 15px rgba(173, 181, 189, 0.4); }
+.futuristic-button.btn-success { background: linear-gradient(45deg, #198754, #105c38); color: white; border-color: #105c38; }
+.futuristic-button.btn-success:hover { border-color: #20c997; box-shadow: 0 0 15px rgba(32, 201, 151, 0.4); }
+.futuristic-button.btn-danger { background: linear-gradient(45deg, #dc3545, #a71d2a); color: white; border-color: #a71d2a; }
+.futuristic-button.btn-danger:hover { border-color: #ff6b79; box-shadow: 0 0 15px rgba(255, 107, 121, 0.4); }
+
+
+/* Delete Confirmation Styling */
+.delete-confirm-container .warning-text { color: #ffcc00; font-size: 1.3em; font-weight: 700; margin-bottom: 25px; display: flex; align-items: center; }
+.delete-confirm-container .warning-text i { font-size: 1.5em; margin-right: 15px; text-shadow: 0 0 10px #ffcc00; }
+.delete-confirm-container .btn-delete { background: linear-gradient(45deg, #e74c3c, #c0392b); border-color: #c0392b; }
+.delete-confirm-container .btn-delete:hover { border-color: #ff786e; box-shadow: 0 0 15px rgba(255, 120, 110, 0.5); }
+
+
+/* Password Change Done Styling */
+.password-change-done-container h1 { color: #28a745; text-shadow: 0 0 8px rgba(40, 167, 69, 0.5); }
+

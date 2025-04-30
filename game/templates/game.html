@@ -1,14 +1,14 @@
+{% extends "base_template.html" %} {# ADDED: Extend the base template #}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conway's Game of Life - Let's Play!</title>
+
+{% block title %}Conway's Game of Life - Let's Play!{% endblock %} {# ADDED: Define title block #}
+
+{% block extra_css %} {# ADDED: Define CSS block #}
+    {# Link the main styles.css (also linked in base, but good practice) #}
     <link rel="stylesheet" href="{% static 'styles.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    {# Font Awesome is already linked in base_template.html #}
     <style>
-        /* Inline styles for page layout and theme - Restored Colorful Version */
+        /* --- Styles specific to the game page content --- */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap');
 
@@ -17,74 +17,16 @@
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-
-        body {
-            font-family: 'Nunito', 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
-            color: #343a40;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+        @keyframes wobble {
+          0%, 100% { transform: translateX(0%); }
+          15% { transform: translateX(-6px) rotate(-4deg); }
+          30% { transform: translateX(4px) rotate(3deg); }
+          45% { transform: translateX(-3px) rotate(-2deg); }
+          60% { transform: translateX(2px) rotate(1deg); }
+          75% { transform: translateX(-1px) rotate(-0.5deg); }
         }
 
-        header {
-            background-color: rgba(30, 30, 40, 0.85);
-            backdrop-filter: blur(8px);
-            color: #f8f9fa;
-            width: 100%;
-            padding: 18px 20px; /* Added horizontal padding */
-            text-align: center;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-sizing: border-box;
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: 2.2em;
-            font-weight: 700;
-            letter-spacing: 1px;
-            display: inline-block;
-            vertical-align: middle;
-        }
-
-        .user-info {
-            position: absolute;
-            top: 50%;
-            right: 25px;
-            transform: translateY(-50%);
-            font-size: 0.95em;
-            display: flex;
-            align-items: center;
-        }
-
-        .user-info span { /* Style username */
-            font-weight: 700;
-            margin-right: 15px; /* Adjusted margin */
-            color: #ffffff;
-        }
-
-        .user-info a { /* Logout link */
-            color: #ced4da;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.2s ease, transform 0.2s ease;
-            display: inline-block;
-            margin-left: 10px;
-        }
-
-        .user-info a:hover {
-            color: #ffc107;
-            transform: scale(1.1);
-        }
-
-        main {
+        .game-main-content { /* Use a specific class if needed */
             flex: 1;
             width: 100%;
             max-width: 1200px;
@@ -96,7 +38,7 @@
             box-sizing: border-box;
         }
 
-        .game-container { /* Renamed from game-area-container for clarity */
+        .game-container {
             background: rgba(255, 255, 255, 0.92);
             padding: 35px;
             border-radius: 15px;
@@ -108,36 +50,22 @@
             max-width: 100%;
             box-sizing: border-box;
         }
-
-        .game-description p { /* Adjusted selector */
+        .game-description p {
             font-size: 1.2em;
             margin-top: 0;
             margin-bottom: 30px;
             color: #333;
             font-weight: 700;
         }
-
-        #grid { /* Refers to external styles for grid display/cells */
+        #grid {
              margin-bottom: 35px;
         }
-
         .controls {
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
             gap: 20px;
         }
-
-        /* Button wobble animation */
-        @keyframes wobble {
-          0%, 100% { transform: translateX(0%); }
-          15% { transform: translateX(-6px) rotate(-4deg); }
-          30% { transform: translateX(4px) rotate(3deg); }
-          45% { transform: translateX(-3px) rotate(-2deg); }
-          60% { transform: translateX(2px) rotate(1deg); }
-          75% { transform: translateX(-1px) rotate(-0.5deg); }
-        }
-
         .controls button {
              padding: 12px 30px;
              font-size: 1.05rem;
@@ -152,91 +80,69 @@
              color: white;
              text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
         }
-
         .controls button:hover {
              transform: scale(1.05);
              box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-             /* animation: wobble 0.8s ease; */ /* Optional wobble on hover */
         }
          .controls button:active {
              transform: scale(0.97);
              box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
         }
-
-        /* Specific button colors */
         #start-button { background: linear-gradient(45deg, #28a745, #218838); }
         #start-button:hover { background: linear-gradient(45deg, #34c759, #2ca049); }
-
         #stop-button { background: linear-gradient(45deg, #dc3545, #c82333); }
         #stop-button:hover { background: linear-gradient(45deg, #e74c3c, #d63031); }
-
         #clear-button { background: linear-gradient(45deg, #6c757d, #5a6268); }
         #clear-button:hover { background: linear-gradient(45deg, #7f8c8d, #6c7a89); }
-
-        /* Styling for the 'Learn More' button link */
         .learn-more-link button {
-            background: linear-gradient(45deg, #0dcaf0, #0a9cb5); /* Example: Info blue gradient */
-            padding: 10px 25px; /* Slightly smaller */
+            background: linear-gradient(45deg, #0dcaf0, #0a9cb5);
+            padding: 10px 25px;
             font-size: 1rem;
         }
         .learn-more-link button:hover {
              background: linear-gradient(45deg, #34d3f5, #0daac4);
-             transform: scale(1.05); /* Keep hover effect consistent */
+             transform: scale(1.05);
              box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
         }
          .learn-more-link button:active {
              transform: scale(0.97);
              box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
         }
-         .learn-more-link a { /* Remove default link underline */
+         .learn-more-link a {
             text-decoration: none;
          }
-
-
-        footer {
-            text-align: center;
-            padding: 20px;
-            font-size: 0.9em;
-            color: #f8f9fa;
-            width: 100%;
-            margin-top: auto;
-            background-color: rgba(30, 30, 40, 0.85);
-            backdrop-filter: blur(8px);
-            box-sizing: border-box;
-        }
-        /* Modal related styles removed from here, rely on styles.css */
     </style>
-</head>
-<body>
-    <header>
-        <h1>Conway's Game of Life</h1>
-        <div class="user-info">
-            <span class="user-name">Welcome, {{ user.username }}!</span>
-            <a href="{% url 'game:logout' %}" class="logout-link">Logout</a>
-        </div>
-    </header>
+{% endblock %}
 
-    <main class="main-content">
-        <div class="game-container"> <div class="game-description"> <p>Click cells to bring them to life!</p>
+
+{% block content %} {# ADDED: Wrap content in block #}
+    {# Removed <header> as it comes from base_template.html #}
+    <main class="game-main-content"> {# Changed class from main-content #}
+        <div class="game-container">
+             <div class="game-description">
+                 <p>Click cells to bring them to life!</p>
              </div>
              <div id="grid" class="game-grid">
-                </div>
+                {# Grid generated by JS #}
+             </div>
             <div class="controls">
                 <button id="start-button">Start Life</button>
                 <button id="stop-button">Pause Life</button>
                 <button id="clear-button">Reset World</button>
             </div>
-            <div class="controls learn-more-link" style="text-align: center; margin-top: 25px;"> <a href="{% url 'game:learn_more' %}">
+            <div class="controls learn-more-link" style="text-align: center; margin-top: 25px;">
+                 <a href="{% url 'game:learn_more' %}">
                     <button>Learn More</button>
-                </a>
+                 </a>
             </div>
         </div>
     </main>
+    {# Removed <footer> as it comes from base_template.html #}
+{% endblock %}
 
-    <footer class="site-footer">
-        &copy; CSCI4830 - Watch the simulation unfold!
-    </footer>
 
+{% block extra_js %} {# ADDED: Define JS block #}
     <script src="{% static 'game.js' %}"></script>
-</body>
-</html>
+{% endblock %}
+
+{# Removed <!DOCTYPE html>, <html>, <head>, <body> tags as they come from base_template.html #}

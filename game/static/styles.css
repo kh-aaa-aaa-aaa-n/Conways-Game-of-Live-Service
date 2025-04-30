@@ -1,269 +1,214 @@
-/* styles.css */
 
-/* --- Grid and Cell Styles (Colorful Version) --- */
+/* === BODY & BASE STYLES (with Darker, Slower Animation) === */
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: #333; /* Default text on light backgrounds (like modals) */
+
+    /* Darker Animated Background */
+    background: linear-gradient(135deg,
+        #6a0dad, /* Purple */
+        #8a2be2, /* BlueViolet */
+        #00008b, /* DarkBlue */
+        #483d8b, /* DarkSlateBlue */
+        #8b0000, /* DarkRed */
+        #a52a2a, /* Brown (acts like dark orange/red) */
+        #6a0dad  /* Repeat Purple for smooth loop */
+    );
+    background-size: 300% 300%; /* Can adjust size */
+    animation: darkScroll 40s ease infinite; /* Apply SLOWER animation */
+    color-scheme: dark; /* Hint to browser for scrollbars etc. */
+}
+
+/* === Darker Animation Keyframes === */
+@keyframes darkScroll {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* === Header Layout and Navigation Styles (with Darker Background) === */
+
+.main-header {
+    /* Darker Animated Background for Header */
+    background: linear-gradient(135deg,
+        #6a0dad, #8a2be2, #00008b, #483d8b,
+        #8b0000, #a52a2a, #6a0dad
+    );
+    background-size: 300% 300%;
+    animation: darkScroll 40s ease infinite; 
+
+
+    color: #e0eaff; /* Light text color on dark background */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6); /* Adjust shadow for dark */
+    padding: 8px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0,0,0, 0.4); /* Adjust shadow */
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-sizing: border-box;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Lighter border */
+}
+
+.main-header h1 {
+    margin: 0;
+    font-size: 1.7em;
+    font-weight: 700;
+}
+
+.main-header h1 a {
+    color: #e0eaff; /* Light text */
+    text-decoration: none;
+    transition: color 0.2s ease, text-shadow 0.2s ease;
+}
+.main-header h1 a:hover {
+    color: #ffffff;
+    text-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
+}
+
+/* --- Navigation List --- */
+.main-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex; /* Horizontal layout */
+    align-items: center;
+    gap: 15px;
+}
+
+.main-nav li {
+    display: list-item;
+}
+
+/* --- Navigation Links --- */
+.main-nav a {
+    color: #c0c5cc; /* Lighter grey text */
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95em;
+    padding: 10px 18px;
+    border-radius: 20px;
+    background-color: rgba(255, 255, 255, 0.05); /* Very subtle light background */
+    border: 1px solid rgba(255, 255, 255, 0.15); /* Light border */
+    transition: color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease, transform 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3); /* Adjust shadow */
+    text-shadow: none; /* Remove text shadow from links if background is light enough */
+}
+.main-nav a:hover,
+.main-nav a:focus {
+    color: #ffffff; /* White on hover */
+    background-color: rgba(255, 255, 255, 0.15); /* Lighter background on hover */
+    box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+    transform: translateY(-1px);
+}
+.main-nav a:active {
+    transform: translateY(0px);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+/* Icons within nav links */
+.main-nav .nav-icon {
+    margin-right: 8px;
+    font-size: 1em;
+    opacity: 0.8;
+}
+
+/* --- Avatar in Header --- */
+.profile-pic-small {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.4); /* Lighter border */
+    object-fit: cover;
+    margin-left: 10px;
+}
+
+
+/* === Main Content Area === */
+.content-area {
+    flex: 1;
+    padding: 25px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+/* === Footer Styles (Adjusted for Dark) === */
+.site-footer {
+    text-align: center;
+    padding: 18px;
+    font-size: 0.9em;
+    color: #c0c5cc; /* Match link text color */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+    width: 100%;
+    margin-top: auto;
+    background-color: rgba(30, 35, 50, 0.92); /* Dark solid footer */
+    /* backdrop-filter: blur(10px); */ /* Optional blur */
+    box-sizing: border-box;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+
+/* === Message Styling === */
+/* Keep existing message styles, they should contrast okay */
+.messages { /* ... */ }
+.messages li { /* ... */ }
+/* ... etc ... */
+
+
+/* === Grid and Cell Styles (Adjusted for Dark) === */
 #grid {
     display: grid;
-    border: 2px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
-    background-color: rgba(255, 255, 255, 0.1);
-    margin: 0 auto; /* Keep centering */
+    border: 2px solid rgba(255, 255, 255, 0.1); /* Lighter border on dark bg */
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.3); /* Darker grid background */
+    margin: 0 auto;
     width: fit-content;
-    max-width: 100%; /* Prevent overflow */
+    max-width: 100%;
     line-height: 0;
     padding: 5px;
     border-radius: 8px;
-    overflow: auto; /* Add scrollbars if grid itself is too wide */
+    overflow: auto;
 }
-
-@keyframes pulseAlive {
-  0% { transform: scale(1); box-shadow: 0 0 3px #ffc107; }
-  50% { transform: scale(1.05); box-shadow: 0 0 8px #ffc107; }
-  100% { transform: scale(1); box-shadow: 0 0 3px #ffc107; }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
 .cell {
-    width: 16px;
-    height: 16px;
-    background-color: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    width: 16px; height: 16px;
+    background-color: rgba(255, 255, 255, 0.05); /* Faint dead cells */
+    border: 1px solid rgba(255, 255, 255, 0.03);
     transition: background-color 0.4s ease, border-color 0.4s ease, transform 0.2s ease, border-radius 0.4s ease;
-    cursor: pointer;
-    border-radius: 3px;
-    opacity: 0.8;
-    animation: fadeIn 0.5s ease forwards;
-    box-sizing: border-box; /* Include border in size */
+    cursor: pointer; border-radius: 3px; opacity: 0.8;
+    box-sizing: border-box;
 }
-
 .cell:hover {
-    background-color: rgba(255, 255, 255, 0.4);
-    border-color: rgba(255, 255, 255, 0.5);
-    transform: scale(1.1);
-    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1); opacity: 1;
 }
-
 .cell.alive {
-    background-color: #ffc107;
-    border-color: #e0a800;
+    background-color: #00e6e6; /* Cyan */
+    border-color: #00cccc;
     opacity: 1;
-    animation: pulseAlive 1.5s infinite ease-in-out;
-    border-radius: 50%; /* Circular alive cells */
+    border-radius: 50%;
 }
-
 .cell.alive:hover {
-     background-color: #ffd700;
-     border-color: #ffc107;
+     background-color: #33ffff;
+     border-color: #00e6e6;
      animation-name: none;
      transform: scale(1.15);
 }
 
-
-/* --- MODAL STYLES (Ensure Correct Positioning) --- */
-
-/* Class added to body by JS when modal is open */
-body.modal-active {
-    overflow: hidden; /* *** CRITICAL: PREVENTS BACKGROUND SCROLL *** */
-}
-
-.modal {
-    position: fixed; /* *** CRITICAL: Position relative to viewport *** */
-    inset: 0; /* *** CRITICAL: Cover entire viewport *** */
-    z-index: 1050; /* *** CRITICAL: High z-index to be on top *** */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px; /* Spacing from viewport edges */
-    box-sizing: border-box;
-    visibility: hidden; /* Start hidden */
-    opacity: 0;
-    transition: opacity 0.4s ease, visibility 0s linear 0.4s;
-}
-
-.modal-backdrop {
-    position: fixed;
-    inset: 0;
-    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black */
-    backdrop-filter: blur(4px);
-    z-index: 1040; /* Below modal content */
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.4s ease, visibility 0s linear 0.4s;
-}
-
-.modal.modal-open {
-    visibility: visible; /* Show */
-    opacity: 1;
-    transition: opacity 0.4s ease;
-}
-
-.modal.modal-open + .modal-backdrop {
-    visibility: visible;
-    opacity: 1;
-    transition: opacity 0.4s ease;
-}
-
-/* Modal Content Styling (Matches colorful theme) */
-.modal-content {
-    background: linear-gradient(135deg, rgba(50, 50, 65, 0.97), rgba(30, 30, 45, 0.97));
-    color: #f0f0f0;
-    padding: 30px 40px;
-    border-radius: 15px;
-    max-width: 700px;
-    width: 100%; /* Responsive width */
-    position: relative;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transform: scale(0.9) translateY(-20px); /* Animation start */
-    transition: transform 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28); /* Bounce effect */
-    max-height: 85vh; /* Limit height */
-    overflow-y: auto; /* Scroll inside modal */
-    box-sizing: border-box;
-}
-
-.modal.modal-open .modal-content {
-    transform: scale(1) translateY(0); /* Animation end */
-}
-
-.modal-close-btn {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    background: none;
-    border: none;
-    font-size: 2.5em;
-    color: #aaa;
-    cursor: pointer;
-    line-height: 1;
-    padding: 0 5px;
-    transition: color 0.2s ease, transform 0.2s ease;
-    z-index: 10; /* Above content */
-}
-
-.modal-close-btn:hover {
-    color: #ff7675;
-    transform: rotate(90deg) scale(1.1);
-}
-
-.modal-title {
-    font-size: 2.2em;
-    margin-top: 0;
-    margin-bottom: 25px;
-    color: #ffc107; /* Yellow title */
-    font-weight: 700;
-    text-align: center;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
-}
-.modal-title i {
-    margin-right: 15px;
-    transform: translateY(2px);
-}
-
-.modal-body {
-    font-size: 1.05em;
-    line-height: 1.7;
-}
-
-.modal-body p {
-    margin-bottom: 1.5em;
-}
-.modal-body strong {
-    color: #fdcb6e; /* Light yellow */
-    font-weight: 700;
-}
-.modal-body hr {
-    border: none;
-    height: 1px;
-    background-image: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
-    margin: 30px 0;
-}
-
-/* Purpose Modal Specific (Colorful theme) */
-.purpose-points {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 25px;
-    text-align: center;
-}
-.purpose-points div {
-    background-color: rgba(255, 255, 255, 0.05);
-    padding: 20px;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.purpose-points div:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-}
-.purpose-points h3 {
-    margin-top: 10px;
-    margin-bottom: 8px;
-    color: #a29bfe; /* Lavender */
-    font-size: 1.2em;
-}
-.purpose-points p {
-    font-size: 0.95em;
-    color: #ccc;
-    margin-bottom: 0;
-}
-.point-icon {
-    font-size: 2.5em;
-    margin-bottom: 10px;
-    color: #a29bfe; /* Lavender */
-}
-
-/* Rules Modal Specific (Colorful theme) */
-.rules-list {
-    list-style: none;
-    padding-left: 0;
-}
-/* Use ul for rules list for semantics */
-.rules-list.detailed-rules li {
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: 20px; /* Slightly less margin */
-    padding: 15px;
-    background-color: rgba(255, 255, 255, 0.03);
-    border-radius: 8px;
-    border-left: 4px solid;
-    transition: background-color 0.3s ease;
-}
-.rules-list.detailed-rules li:hover {
-    background-color: rgba(255, 255, 255, 0.07);
-}
-
-/* Rule Colors */
-.rules-list.detailed-rules li:nth-child(1) { border-color: #ff7675; } /* Underpopulation - Red */
-.rules-list.detailed-rules li:nth-child(2) { border-color: #74b9ff; } /* Survival - Blue */
-.rules-list.detailed-rules li:nth-child(3) { border-color: #ff7675; } /* Overpopulation - Red */
-.rules-list.detailed-rules li:nth-child(4) { border-color: #55efc4; } /* Birth - Green */
-
-.rule-icon {
-    font-size: 1.8em;
-    margin-right: 20px;
-    padding: 10px;
-    border-radius: 50%;
-    width: 45px;
-    height: 45px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    text-align: center;
-    margin-top: 3px;
-}
-.rule-icon.birth { background-color: rgba(85, 239, 196, 0.2); color: #55efc4; }
-.rule-icon.survival { background-color: rgba(116, 185, 255, 0.2); color: #74b9ff; }
-.rule-icon.death { background-color: rgba(255, 118, 117, 0.2); color: #ff7675; }
-
-.rules-list.detailed-rules li > div:last-child { /* Text container */
-    flex-grow: 1;
-}
-.rules-list.detailed-rules li strong {
-    font-weight: 700;
-    color: #fff;
-}
