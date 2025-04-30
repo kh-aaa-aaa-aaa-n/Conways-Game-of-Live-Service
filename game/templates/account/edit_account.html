@@ -1,0 +1,77 @@
+{% extends "base_template.html" %}
+{% load static %}
+
+{% block title %}Edit Account{% endblock %}
+
+{% block content %}
+<div class="edit-account-container futuristic-style">
+    <h1>Edit Your Account & Settings</h1>
+
+    {# Current Avatar Display #}
+    <div class="current-profile-pic">
+        <h3>Current Avatar</h3>
+        {% if current_avatar_url %}
+            <img src="{{ current_avatar_url }}" alt="Current Avatar" class="profile-pic-medium">
+        {% endif %}
+    </div>
+
+    {# NOTE: No enctype needed for this form anymore #}
+    <form method="POST">
+        {% csrf_token %}
+
+        {# --- User Info Section --- #}
+        <fieldset class="form-section">
+            <legend>Core User Info</legend>
+            {# Render User form fields #}
+            {{ u_form.as_p }}
+        </fieldset>
+
+        {# --- Profile & Settings Section --- #}
+        <fieldset class="form-section">
+            <legend>Profile Settings</legend>
+
+            {# Avatar Selection - Render manually with images #}
+            <div class="form-field-group">
+                <label>{{ p_form.selected_avatar.label }}</label>
+                <div class="avatar-choices">
+                    {% for radio in p_form.selected_avatar %}
+                    <label class="avatar-choice-label">
+                        {{ radio.tag }} {# Renders the <input type="radio"> #}
+
+                        {# --- Reverting to using radio.choice_value --- #}
+                        <img src="{% static 'images/avatars/' %}{{ radio.choice_value }}" alt="{{ radio.choice_label }}" class="avatar-preview">
+                        {# --- END OF CHANGE --- #}
+
+                        <span>{{ radio.choice_label }}</span> {# Display label text #}
+                    </label>
+                    {% endfor %}
+                </div>
+                 {# Display field errors if any #}
+                 {% if p_form.selected_avatar.errors %}
+                    <div class="form-errors error-text">{{ p_form.selected_avatar.errors }}</div>
+                 {% endif %}
+            </div>
+
+             {# Bio Field #}
+             <div class="form-field-group">
+                 <label for="{{ p_form.bio.id_for_label }}">{{ p_form.bio.label }}</label>
+                 {{ p_form.bio }} {# Renders the <textarea> #}
+                 {% if p_form.bio.help_text %}<small class="form-help-text">{{ p_form.bio.help_text }}</small>{% endif %}
+                 {% if p_form.bio.errors %}<div class="form-errors error-text">{{ p_form.bio.errors }}</div>{% endif %}
+             </div>
+
+        </fieldset>
+
+        {# Form Actions #}
+        <div class="form-actions">
+            <button type="submit" class="btn btn-success futuristic-button">Save Changes</button>
+            <a href="{% url 'game:account' %}" class="btn btn-secondary futuristic-button btn-cancel">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+{# Ensure account_styles.css is linked in base or here #}
+{# <link rel="stylesheet" href="{% static 'account_styles.css' %}"> #}
+{% endblock %}

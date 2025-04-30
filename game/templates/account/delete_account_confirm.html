@@ -1,0 +1,25 @@
+{% extends "base_template.html" %}
+{% load static %}
+
+{% block title %}Confirm Account Deletion{% endblock %}
+
+{% block content %}
+<div class="delete-confirm-container futuristic-style">
+    <h1>Delete Account</h1>
+    <p class="warning-text"><i class="fas fa-exclamation-triangle"></i> Are you sure you want to delete your account?</p>
+    <p>Username: <strong>{{ user.username }}</strong></p>
+    <p>This action is permanent and cannot be undone. All your data associated with this account will be removed.</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-actions">
+            <button type="submit" class="btn btn-danger futuristic-button btn-delete">Yes, Delete My Account</button>
+            <a href="{% url 'game:account' %}" class="btn btn-secondary futuristic-button btn-cancel">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+{# Styles are linked in base_template.html #}
+{% endblock %}

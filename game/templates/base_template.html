@@ -1,0 +1,69 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Conway's Game of Life{% endblock %}</title>
+    {# Link to Font Awesome if using icons #}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    {# Link to base styles and account styles - Added version query to help bust cache #}
+    <link rel="stylesheet" href="{% static 'styles.css' %}?v={% now 'U' %}">
+    <link rel="stylesheet" href="{% static 'account_styles.css' %}?v={% now 'U' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header class="main-header">
+        <h1><a href="{% url 'game:start_page' %}">Conway's Game of Life</a></h1>
+        <nav class="main-nav">
+            <ul>
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'game:game' %}"><i class="fas fa-border-all nav-icon"></i>Game</a></li>
+                    {# === ADDED LEARN MORE LINK HERE === #}
+                    <li><a href="{% url 'game:learn_more' %}"><i class="fas fa-info-circle nav-icon"></i>Learn More</a></li>
+                    {# ================================ #}
+                    <li><a href="{% url 'game:account' %}"><i class="fas fa-user-circle nav-icon"></i>Account</a></li>
+                    <li>
+                        {# Avatar moved INSIDE the <a> tag #}
+                        <a href="{% url 'game:logout' %}" class="logout-link-with-avatar">
+                            <i class="fas fa-sign-out-alt nav-icon"></i>Logout
+                            {% if profile_avatar_url %}
+                                <img src="{{ profile_avatar_url }}" alt="User Avatar" class="profile-pic-small">
+                            {% else %}
+                                 <img src="{% static 'images/avatars/default_avatar.png' %}" alt="Default Avatar" class="profile-pic-small">
+                            {% endif %}
+                        </a>
+                    </li>
+                {% else %}
+                    {# === ALSO ADD LEARN MORE FOR LOGGED OUT USERS? (Optional) === #}
+                     <li><a href="{% url 'game:learn_more' %}"><i class="fas fa-info-circle nav-icon"></i>Learn More</a></li>
+                    {# ========================================================= #}
+                    <li><a href="{% url 'game:login' %}"><i class="fas fa-sign-in-alt nav-icon"></i>Login</a></li>
+                    <li><a href="{% url 'game:register' %}"><i class="fas fa-user-plus nav-icon"></i>Register</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main class="content-area">
+         {# Display Django messages #}
+         {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        {% block content %}
+        {# Page-specific content goes here #}
+        {% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        &copy; {% now "Y" %} Conway's Futuristic Life Service
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
