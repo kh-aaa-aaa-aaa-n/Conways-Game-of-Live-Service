@@ -1,7 +1,7 @@
-# game/urls.py
+
 from django.urls import path
 from . import views
-# Import your custom password views
+
 from .views import CustomPasswordChangeView, CustomPasswordChangeDoneView
 
 app_name = 'game'
