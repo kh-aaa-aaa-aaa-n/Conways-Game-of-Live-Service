@@ -59,6 +59,10 @@ class ConwayGame:
                         new_grid[r][c] = 1 # Becomes alive by reproduction
                     else:
                         new_grid[r][c] = 0 # Stays dead
+        print("Updated grid:")
+        for row in new_grid:
+            print("".join(str(cell) for cell in row))
+
         self.grid = new_grid
 
     def clear_grid(self):

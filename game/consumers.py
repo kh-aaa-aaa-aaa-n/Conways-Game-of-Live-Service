@@ -1,3 +1,10 @@
+from channels.layers import get_channel_layer
+import os
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "convoy_game.settings")
+
+import django
+django.setup()
+
 import json
 import asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
@@ -22,6 +29,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         self.simulation_task = None
         self.simulation_speed = 0.5 
 
+        await self.channel_layer.group_add("game_group", self.channel_name)
         await self.accept()
         await self.send(text_data=json.dumps({
              'type': 'connection_established',
@@ -39,6 +47,8 @@ class GameConsumer(AsyncWebsocketConsumer):
             except asyncio.CancelledError:
                  print("Simulation task cancelled on disconnect.")
             self.simulation_task = None
+            await self.channel_layer.group_discard("game_group", self.channel_name)
+
 
 
     async def receive(self, text_data):
@@ -112,15 +122,18 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     async def send_grid_update(self):
         """Sends the current grid state to the client."""
-        if self.channel_layer and self.channel_name: 
+        if self.channel_layer:
              try:
                   grid_data = shared_game.get_grid_for_json() 
-                  await self.send(text_data=json.dumps({
-                     'type': 'grid_update',
-                     'grid': grid_data
-                  }))
+                  await self.channel_layer.group_send(
+                     "game_group",
+                     {
+                         "type": "broadcast_grid_update",
+                         "grid": grid_data
+                     }
+                 )
              except Exception as e:
-                  print(f"Error sending grid update: {e}")
+                  print(f"Error broadcasting grid update: {e}")
 
 
     async def send_initial_state(self):
@@ -299,3 +312,10 @@ class GameConsumer(AsyncWebsocketConsumer):
              }))
          else:
              await self.send_error(f"Could not load saved state with ID {save_id}.")
+
+    async def broadcast_grid_update(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'grid_update',
+            'grid': event['grid']
+        }))
+
