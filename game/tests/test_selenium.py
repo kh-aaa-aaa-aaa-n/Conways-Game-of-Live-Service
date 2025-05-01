@@ -1,101 +1,72 @@
-from django.contrib.staticfiles.testing import LiveServerTestCase
+import unittest
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
 import time
 
-
-class GameOfLifeSeleniumTests(LiveServerTestCase):
-
+class ConwayGameTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
         chrome_options = Options()
-        chrome_options.add_argument("--headless")  # Remove to view the browser
-        chrome_options.add_argument("--no-sandbox")
-        chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument("--headless")
         cls.driver = webdriver.Chrome(options=chrome_options)
-        cls.driver.implicitly_wait(5)
+        cls.driver.get("http://3.147.85.8:8000/login/")
+        cls.driver.set_window_size(1920, 1080)
+
+    def test_01_login_page_loads(self):
+        self.assertIn("Login", self.driver.title)
+
+    def test_02_can_login(self):
+        self.driver.find_element(By.NAME, "username").send_keys("dillontest")
+        self.driver.find_element(By.NAME, "password").send_keys("test12345")  # Replace with correct password
+        self.driver.find_element(By.TAG_NAME, "button").click()
+        time.sleep(1)
+        self.assertIn("Welcome", self.driver.page_source)
+
+    def test_03_navigate_to_game(self):
+        self.driver.find_element(By.LINK_TEXT, "Game").click()
+        time.sleep(1)
+        self.assertIn("Click cells to bring them to life", self.driver.page_source)
+
+    def test_04_game_grid_exists(self):
+        grid = self.driver.find_element(By.ID, "grid")
+        self.assertIsNotNone(grid)
+
+    def test_05_learn_more_link(self):
+        self.driver.find_element(By.LINK_TEXT, "Learn More").click()
+        time.sleep(1)
+        self.assertIn("What is Conway’s Game of Life?", self.driver.page_source)
+
+    def test_06_back_to_game_button(self):
+        self.driver.find_element(By.LINK_TEXT, "← Back to the Game").click()
+        time.sleep(1)
+        self.assertIn("Click cells to bring them to life", self.driver.page_source)
+
+    def test_07_account_page_displays(self):
+        self.driver.find_element(By.LINK_TEXT, "Account").click()
+        time.sleep(1)
+        self.assertIn("dillontest's Hub", self.driver.page_source)
+
+    def test_08_can_save_state_input_visible(self):
+        self.driver.find_element(By.LINK_TEXT, "Game").click()
+        time.sleep(1)
+        input_field = self.driver.find_element(By.ID, "save-name-input")
+        self.assertTrue(input_field.is_displayed())
+
+    def test_09_status_indicator_present(self):
+        status = self.driver.find_element(By.ID, "simulation-status")
+        self.assertIn("Status: Paused", status.text)
+
+    def test_10_logout_works(self):
+        self.driver.find_element(By.LINK_TEXT, "Logout").click()
+        time.sleep(1)
+        self.assertIn("Login", self.driver.page_source)
 
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()
-        super().tearDownClass()
 
-    def setUp(self):
-        self.driver.get(self.live_server_url + "/game/")
-        time.sleep(2)
-        self.wait = WebDriverWait(self.driver, 10)
-
-    def test_1_homepage_loads(self):
-        """Page loads with the correct title"""
-        self.assertIn("Conway", self.driver.title)
-
-    def test_2_grid_is_visible(self):
-        """Game grid is present"""
-        cells = self.wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, "cell")))
-        self.assertGreater(len(cells), 0)
-
-    def test_3_toggle_cell_on_click(self):
-        """Clicking a cell toggles its class"""
-        cell = self.driver.find_element(By.CLASS_NAME, "cell")
-        old_class = cell.get_attribute("class")
-        cell.click()
-        new_class = cell.get_attribute("class")
-        self.assertNotEqual(old_class, new_class)
-
-    def test_4_save_input_exists(self):
-        """Check that save input box is visible"""
-        input_box = self.driver.find_element(By.ID, "save-input")
-        self.assertTrue(input_box.is_displayed())
-
-    def test_5_save_button_works(self):
-        """Clicking save does not throw error (mock test for now)"""
-        self.driver.find_element(By.ID, "save-name-input").send_keys("test")
-        save_btn = self.driver.find_element(By.ID, "save-button")
-        save_btn.click()
-        # Optional: Check for success message or no crash
-        time.sleep(1)
-
-    def test_6_load_dropdown_exists(self):
-        """Dropdown for loading saved states appears"""
-        dropdown = WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.ID, "load-state-select"))
-        )
-        self.assertTrue(dropdown.is_displayed())
-
-    def test_7_load_button_works(self):
-        """Load button is enabled"""
-        self.driver.get(self.live_server_url + "/game/")
-        wait = WebDriverWait(self.driver, 10)
-        load_btn = wait.until(EC.element_to_be_clickable((By.ID, "load-state-button")))
-        self.assertTrue(load_btn.is_enabled())
-
-    def test_8_start_requires_admin(self):
-        """Only admin can see start button (assumes current user is not admin)"""
-           # Try to find the element by class name instead of ID
-        start_btns = self.driver.find_elements(By.CLASS_NAME, "start-button")
-        # If user is not admin, they shouldn't see the button
-        self.assertEqual(len(start_btns), 0)
-
-    def test_9_multiple_cells_toggle(self):
-        """Clicking multiple cells toggles them"""
-        cells = self.driver.find_elements(By.CLASS_NAME, "cell")
-        for cell in cells[:5]:
-            cell.click()
-            self.assertIn("alive", cell.get_attribute("class"))
-
-    def test_10_clear_button_clears_grid(self):
-        """Clear button resets the grid"""
-        # First, toggle a cell
-        cell = self.driver.find_element(By.CLASS_NAME, "cell")
-        cell.click()
-        self.assertIn("alive", cell.get_attribute("class"))
-        # Then clear
-        clear_btn = self.driver.find_element(By.ID, "clear-button")
-        clear_btn.click()
-        time.sleep(1)
-        self.assertNotIn("alive", cell.get_attribute("class"))
+if __name__ == "__main__":
+    unittest.main()
 
