@@ -6,6 +6,8 @@ from .conway import ConwayGame
 from .models import SavedGameState 
 from django.contrib.auth.models import User 
 
+shared_game = ConwayGame(width = 50, height = 50)
+
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.user = self.scope["user"]
@@ -17,8 +19,6 @@ class GameConsumer(AsyncWebsocketConsumer):
              return
 
         print(f"WebSocket connection accepted for user: {self.user.username}")
-        # Each user connection gets its own game instance for now
-        self.game = ConwayGame(width=20, height=20)
         self.simulation_task = None
         self.simulation_speed = 0.5 
 
@@ -55,7 +55,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             if action == 'toggle_cell':
                 if 'row' in data and 'col' in data and 'state' in data:
                     row, col, state = int(data['row']), int(data['col']), bool(data['state'])
-                    self.game.set_cell(row, col, state)
+                    shared_game.set_cell(row, col, state)
                     await self.send_grid_update()
                 else:
                     await self.send_error("Missing data for toggle_cell action.")
@@ -114,7 +114,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         """Sends the current grid state to the client."""
         if self.channel_layer and self.channel_name: 
              try:
-                  grid_data = self.game.get_grid_for_json() 
+                  grid_data = shared_game.get_grid_for_json() 
                   await self.send(text_data=json.dumps({
                      'type': 'grid_update',
                      'grid': grid_data
@@ -127,7 +127,7 @@ class GameConsumer(AsyncWebsocketConsumer):
          """Sends the initial grid state when requested."""
          if self.channel_layer and self.channel_name:
               try:
-                   grid_data = self.game.get_grid_for_json()
+                   grid_data = shared_game.get_grid_for_json()
                    await self.send(text_data=json.dumps({
                        'type': 'initial_state',
                        'grid': grid_data
@@ -141,7 +141,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         print(f"Simulation loop starting for {self.user.username} with speed {self.simulation_speed}s")
         while True:
             try:
-                self.game.update_grid()
+                shared_game.update_grid()
                 await self.send_grid_update()
                 await asyncio.sleep(self.simulation_speed) 
             except asyncio.CancelledError:
@@ -190,7 +190,7 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def clear_grid(self):
          print(f"Clearing grid for {self.user.username}")
          await self.stop_simulation() # Stop simulation before clearing
-         self.game.clear_grid()
+         shared_game.clear_grid()
          await self.send_grid_update() # Send the cleared grid state
          # Optionally, send feedback
          await self.send(text_data=json.dumps({'type': 'grid_cleared'}))
@@ -272,7 +272,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     async def save_game_state(self, name):
          """Handles the 'save_state' action."""
-         grid_data = self.game.get_grid_for_json() # Get current state
+         grid_data = shared_game.get_grid_for_json() # Get current state
          success, message = await self._save_state_to_db(name, grid_data)
          feedback_type = 'save_success' if success else 'error'
          await self.send(text_data=json.dumps({
@@ -290,7 +290,7 @@ class GameConsumer(AsyncWebsocketConsumer):
          loaded_grid_data = await self._load_state_from_db(save_id)
 
          if loaded_grid_data is not None:
-             self.game.set_grid_from_data(loaded_grid_data) 
+             shared_game.set_grid_from_data(loaded_grid_data) 
              print(f"Successfully loaded grid state ID {save_id} into game instance for {self.user.username}")
              await self.send_grid_update() # Send the loaded state to the client
              await self.send(text_data=json.dumps({
