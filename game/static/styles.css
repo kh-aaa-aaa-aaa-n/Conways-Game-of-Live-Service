@@ -211,4 +211,21 @@ body {
      animation-name: none;
      transform: scale(1.15);
 }
+.user-contributions {
+    margin-top: 30px;
+}
+
+.contribution-list {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.contribution-list li {
+    background-color: #202040;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    color: #eee;
+    font-family: monospace;
+}
 

@@ -15,14 +15,12 @@
         {% endif %}
     </div>
 
-    {# NOTE: No enctype needed for this form anymore #}
     <form method="POST">
         {% csrf_token %}
 
         {# --- User Info Section --- #}
         <fieldset class="form-section">
             <legend>Core User Info</legend>
-            {# Render User form fields #}
             {{ u_form.as_p }}
         </fieldset>
 
@@ -30,36 +28,37 @@
         <fieldset class="form-section">
             <legend>Profile Settings</legend>
 
-            {# Avatar Selection - Render manually with images #}
+            {# Avatar Selection with working radio + image preview #}
             <div class="form-field-group">
                 <label>{{ p_form.selected_avatar.label }}</label>
                 <div class="avatar-choices">
-                    {% for radio in p_form.selected_avatar %}
-                    <label class="avatar-choice-label">
-                        {{ radio.tag }} {# Renders the <input type="radio"> #}
+                    {% for value, label in p_form.selected_avatar.field.choices %}
+                        <input type="radio" name="selected_avatar" value="{{ value }}" id="avatar_{{ forloop.counter }}"
+                            {% if value == p_form.selected_avatar.value %}checked{% endif %}>
 
-                        {# --- Reverting to using radio.choice_value --- #}
-                        <img src="{% static 'images/avatars/' %}{{ radio.choice_value }}" alt="{{ radio.choice_label }}" class="avatar-preview">
-                        {# --- END OF CHANGE --- #}
-
-                        <span>{{ radio.choice_label }}</span> {# Display label text #}
-                    </label>
+                        <label for="avatar_{{ forloop.counter }}" class="avatar-choice-label">
+                            <img src="{% static 'images/avatars/' %}{{ value }}" alt="{{ label }}" class="avatar-preview">
+                            <span>{{ label }}</span>
+                        </label>
                     {% endfor %}
                 </div>
-                 {# Display field errors if any #}
-                 {% if p_form.selected_avatar.errors %}
+
+                {% if p_form.selected_avatar.errors %}
                     <div class="form-errors error-text">{{ p_form.selected_avatar.errors }}</div>
-                 {% endif %}
+                {% endif %}
             </div>
 
-             {# Bio Field #}
-             <div class="form-field-group">
-                 <label for="{{ p_form.bio.id_for_label }}">{{ p_form.bio.label }}</label>
-                 {{ p_form.bio }} {# Renders the <textarea> #}
-                 {% if p_form.bio.help_text %}<small class="form-help-text">{{ p_form.bio.help_text }}</small>{% endif %}
-                 {% if p_form.bio.errors %}<div class="form-errors error-text">{{ p_form.bio.errors }}</div>{% endif %}
-             </div>
-
+            {# Bio Field #}
+            <div class="form-field-group">
+                <label for="{{ p_form.bio.id_for_label }}">{{ p_form.bio.label }}</label>
+                {{ p_form.bio }}
+                {% if p_form.bio.help_text %}
+                    <small class="form-help-text">{{ p_form.bio.help_text }}</small>
+                {% endif %}
+                {% if p_form.bio.errors %}
+                    <div class="form-errors error-text">{{ p_form.bio.errors }}</div>
+                {% endif %}
+            </div>
         </fieldset>
 
         {# Form Actions #}
@@ -72,6 +71,39 @@
 {% endblock %}
 
 {% block extra_css %}
-{# Ensure account_styles.css is linked in base or here #}
-{# <link rel="stylesheet" href="{% static 'account_styles.css' %}"> #}
+<style>
+.avatar-choices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 10px;
+}
+
+.avatar-choice-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    padding: 5px;
+    transition: 0.3s;
+}
+
+.avatar-preview {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #555;
+    margin-bottom: 5px;
+}
+
+input[type="radio"] {
+    display: none;
+}
+
+input[type="radio"]:checked + label .avatar-preview {
+    border-color: #00f0ff;
+    box-shadow: 0 0 8px #00f0ff;
+}
+</style>
 {% endblock %}
