@@ -2,10 +2,15 @@
 import random
 
 class ConwayGame:
-    def __init__(self, width=20, height=20):
+    def __init__(self, width=20, height=20, born_conditions=[3], survive_conditions=[2,3]):
+        # size of game board
         self.width = width
         self.height = height
         self.grid = self.create_empty_grid()
+
+        # rules for when cells become alive / survive a generation
+        self.born_conditions = born_conditions
+        self.survive_conditions = survive_conditions
 
 
     def create_empty_grid(self):
@@ -45,12 +50,12 @@ class ConwayGame:
                 cell_state = self.grid[r][c]
 
                 if cell_state == 1: # If cell is alive
-                    if live_neighbors < 2 or live_neighbors > 3:
-                        new_grid[r][c] = 0 # Dies by underpopulation or overpopulation
-                    else:
+                    if live_neighbors in self.survive_conditions:
                         new_grid[r][c] = 1 # Survives
+                    else:
+                        new_grid[r][c] = 0 # Dies by underpopulation or overpopulation
                 else: # If cell is dead
-                    if live_neighbors == 3:
+                    if live_neighbors in self.born_conditions:
                         new_grid[r][c] = 1 # Becomes alive by reproduction
                     else:
                         new_grid[r][c] = 0 # Stays dead
