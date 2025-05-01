@@ -1,5 +1,6 @@
 /db.sqlite3
 /env_webproject
 /venv
+/env
 __pycache__
 .DS_Store
