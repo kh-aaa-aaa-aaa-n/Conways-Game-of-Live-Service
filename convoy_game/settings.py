@@ -34,7 +34,7 @@ def get_public_ip():
         return None
 
 public_ip = get_public_ip()
-ALLOWED_HOSTS = [public_ip] if public_ip else []
+ALLOWED_HOSTS = ['3.147.85.8', 'localhost', '127.0.0.1']
 
 
 # Application definition
